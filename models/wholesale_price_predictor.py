@@ -36,7 +36,7 @@ def prepare_training_pairs(wholesale_df: pd.DataFrame, retail_df: pd.DataFrame) 
 
 def encode_features(df: pd.DataFrame) -> pd.DataFrame:
 	X = pd.get_dummies(
-		df[["brand", "line", "concentration"]].applymap(lambda s: str(s).strip().lower())
+		df[["brand", "line", "concentration"]].map(lambda s: str(s).strip().lower())
 	)
 	X["size_ml"] = df["size_ml"].astype(float).fillna(0)
 	return X

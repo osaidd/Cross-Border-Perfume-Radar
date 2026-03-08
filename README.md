@@ -1,68 +1,203 @@
 # Cross-Border Perfume Radar (UAE → SG)
 
-A data-driven tool to identify profitable perfume SKUs for cross-border trade from UAE to Singapore, helping e-commerce sellers make informed import decisions.
+A data-driven Streamlit dashboard to identify profitable perfume SKUs for cross-border trade from UAE to Singapore, helping e-commerce sellers make informed import decisions.
 
-## 🎯 Problem Statement
-
-Finding perfume SKUs with the best UAE→SG profit margins while ensuring sufficient market demand is currently a manual, time-consuming process. This tool provides a repeatable, data-driven approach to identify viable import opportunities.
-
-## ✨ Key Features
-
-- **SKU Analysis**: Calculate Landed Unit Cost (LUC) with confidence scoring
-- **Market Intelligence**: SG competitor pricing and demand analysis
-- **Profit Gap Calculation**: UAE wholesale vs. SG retail price analysis
-- **Viability Scoring**: 0-100 score with Import/Wait/Skip recommendations
-- **CSV Export**: Top-performing SKUs for easy analysis
-- **Deep Dive Pages**: Detailed SKU analysis and reorder suggestions
-
-## 🏗️ Architecture
-
-- **Frontend**: Modern web interface for SKU search and analysis
-- **Backend**: Data processing and calculation engine
-- **Data Sources**: 
-  - SG competitor snapshots (Shopee/Lazada)
-  - Dubai wholesale pricing
-  - Public retail proxies (Noon/Amazon.ae)
-  - Cost parameters (shipping, FX, GST, packaging)
-
-## 🚀 Getting Started
-
-*Development setup instructions coming soon...*
-
-## 📊 Data Flow
-
-1. **Input**: SG competitor data, Dubai prices, cost parameters
-2. **Processing**: LUC calculation, profit gap analysis, demand scoring
-3. **Output**: Ranked SKU recommendations with viability scores
-
-## 📈 Success Metrics
-
-- Quick SKU lookup with LUC breakdown
-- Ranked table of 20-50 viable SKUs
-- Configurable cost parameters for accurate calculations
-- Confidence flags for price data reliability
-
-## 🔒 Compliance
-
-- No PII collection
-- Respects robots.txt and Terms of Service
-- Public pages only
-- Low-rate sampling to avoid disruption
-
-## 📅 Development Timeline
-
-- **Week 1**: Foundations
-- **Week 2**: SG module
-- **Week 3**: Dubai & costs
-- **Week 4**: Scoring + UI
-- **Week 5**: Polish + documentation
-
-## 📚 Documentation
-
-- [Product Requirements Document](docs/PRD.md)
-- Technical specifications (coming soon)
-- User guide (coming soon)
+Built for **Imperial Oud** and small SG e-commerce sellers. Covers Lattafa, Rasasi, and Afnan fragrance lines.
 
 ---
 
-*Built for Imperial Oud and small e-commerce sellers in Singapore*
+## Features
+
+- **Ranked SKU table** — viability score (0–100) with Import / Wait / Skip recommendations
+- **LUC calculator** — Landed Unit Cost breakdown: Dubai wholesale × FX + tiered shipping + GST
+- **Configurable parameters** — adjust FX rate, GST, shipping tiers live from the sidebar
+- **SKU Deep Dive** — per-SKU cost waterfall, SG price bands, profit gap, demand heat
+- **CSV export** — top 10 SKUs ready for your buying sheet
+- **Wholesale price predictor** — Ridge regression + brand-ratio model estimates Dubai prices when wholesale data is unavailable
+
+---
+
+## Quick Start
+
+### 1. Clone and set up environment
+
+```bash
+git clone https://github.com/<your-username>/Cross-Border-Perfume-Radar.git
+cd Cross-Border-Perfume-Radar
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 2. Configure cost parameters (optional)
+
+```bash
+cp config/.env.example config/.env
+# Edit config/.env to set your FX rate, GST, and packaging weight
+```
+
+All parameters are also adjustable live in the dashboard sidebar.
+
+### 3. Run the dashboard
+
+```bash
+streamlit run app.py
+```
+
+Open [http://localhost:8501](http://localhost:8501) in your browser.
+
+---
+
+## Project Structure
+
+```
+.
+├── app.py                          # Streamlit dashboard (main entry point)
+├── requirements.txt
+├── config/
+│   ├── cost_rules.yml              # Shipping tiers, weight rules, GST policy
+│   ├── .env.example                # Environment variable template
+│   └── load_config.py              # Config loader (dataclasses + validation)
+├── data/
+│   └── samples/
+│       ├── products.csv            # Product catalogue with deterministic IDs
+│       ├── sg_listings_sample.csv  # Shopee/Lazada price snapshots
+│       ├── dubai_prices_sample.csv # UAE wholesale/proxy prices
+│       └── synonyms.csv            # Brand and name alias table
+├── etl/
+│   ├── id_utils.py                 # Deterministic SHA-1 product ID generation
+│   ├── utils_normalize.py          # Title normalisation + rapidfuzz matching
+│   ├── demo_workflow.py            # End-to-end title → product ID walkthrough
+│   └── test_normalization.py       # Normalisation and matching smoke tests
+├── models/
+│   └── wholesale_price_predictor.py  # Ridge + ratio ensemble price predictor
+├── scripts/
+│   ├── gen_ids.py                  # Regenerate product IDs in products.csv
+│   ├── show_config.py              # Print resolved config to stdout
+│   └── test_catalog.py             # Catalog load + fuzzy-match integration test
+└── docs/
+    ├── PRD.md                      # Product requirements document
+    └── data_workflow.md            # Raw title → product ID mapping explained
+```
+
+---
+
+## Data Pipeline
+
+```
+Raw marketplace title
+        │
+        ▼
+  normalize_title()          ← strip stopwords, map EDP/EDT, extract ml
+        │
+        ▼
+  fuzzy_match_to_product()   ← rapidfuzz token_set_ratio ≥ 85%
+        │
+        ▼
+  product_id (SHA-1 12-char) ← deterministic, brand|line|name|size|conc
+        │
+        ▼
+  Join sg_listings + dubai_prices
+        │
+        ▼
+  calc_luc()                 ← AED×FX + shipping + GST
+        │
+        ▼
+  viability_score()          ← 60% profit gap + 40% demand
+        │
+        ▼
+  Streamlit dashboard
+```
+
+---
+
+## LUC Formula
+
+```
+base_cost_sgd  = dubai_price_aed × fx_aed_sgd
+shipping_sgd   = base_fee + ⌈weight_g / step_grams⌉ × per_step_sgd
+gst_sgd        = base_cost_sgd × gst_rate
+LUC            = base_cost_sgd + shipping_sgd + gst_sgd
+
+profit_gap     = sg_median_price - LUC
+viability      = min(profit_gap/20, 1)×60 + min(sold_30d/50, 1)×40
+```
+
+Default parameters: FX 0.37, GST 9%, shipping S$4 base + S$3.50/500g.
+
+---
+
+## Wholesale Price Predictor
+
+When no wholesale price is available, `models/wholesale_price_predictor.py` estimates it from retail data using a blended model:
+
+- **Ratio estimator** — brand-line median wholesale/retail ratio
+- **Ridge regression** — brand, line, concentration, size as features
+- **Confidence labels** — High (brand-line known) / Med (brand known) / Low (global fallback)
+
+```bash
+python models/wholesale_price_predictor.py \
+  --train data/samples/dubai_prices_sample.csv \
+  --retail data/samples/products.csv \
+  --out data/predictions.csv
+```
+
+---
+
+## Running the ETL Scripts
+
+All scripts are run from the **project root**:
+
+```bash
+# Regenerate product IDs in products.csv
+python scripts/gen_ids.py
+
+# Print resolved config
+python scripts/show_config.py
+
+# Catalog load + fuzzy-match integration test
+python scripts/test_catalog.py
+
+# Title normalisation demo
+python etl/demo_workflow.py
+
+# Full normalisation + matching smoke tests
+python etl/test_normalization.py
+```
+
+---
+
+## Data Sources
+
+| Source | Type | Confidence |
+|--------|------|------------|
+| Wholesale sheet | Known UAE price | 1.0 |
+| Noon / Amazon.ae | Public retail proxy | 0.6 |
+| Predicted (model) | Ridge + ratio estimate | 0.4 |
+
+SG listings are collected as weekly manual CSV snapshots from Shopee and Lazada (public pages only, low-rate sampling, no PII).
+
+---
+
+## Compliance
+
+- No PII collected
+- Respects `robots.txt` and platform Terms of Service
+- Public listing pages only
+- Low-rate sampling to avoid service disruption
+
+---
+
+## Tech Stack
+
+| Layer | Library |
+|-------|---------|
+| Dashboard | Streamlit |
+| Data processing | pandas, numpy |
+| ML model | scikit-learn (Ridge) |
+| String matching | rapidfuzz |
+| Config | PyYAML, python-dotenv |
+
+---
+
+*Built for Imperial Oud and small e-commerce sellers in Singapore.*

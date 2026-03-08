@@ -31,7 +31,7 @@ def fuzzy_match_to_product(title:str, products)->str|None:
     norm = normalize_title(title)
     best = (None, 0)
     for idx,row in products.iterrows():
-        target = f"{row.brand} {row.line} {row.name} {row.size_ml}"
+        target = f"{row.brand} {row.line} {row['name']} {row.size_ml}ml"
         score = fuzz.token_set_ratio(norm["norm_title"], target.lower())
         if score > best[1]:
             best = (row.product_id, score)

@@ -1,0 +1,9 @@
+product_id,price_aed,source,confidence,seen_at
+533d4f17db40,28.00,wholesale,1.0,2024-01-15
+55212edf54e5,32.00,wholesale,1.0,2024-01-15
+2d9358dbcd22,25.00,wholesale,1.0,2024-01-15
+0492df35191e,22.00,wholesale,1.0,2024-01-15
+a23cef909263,18.00,proxy,0.6,2024-01-15
+8b3a1af59c40,20.00,proxy,0.6,2024-01-15
+a07501b2b9e9,30.00,wholesale,1.0,2024-01-15
+06500acad195,24.00,proxy,0.6,2024-01-15

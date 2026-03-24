@@ -1,0 +1,17 @@
+# Cost calculation rules for UAE → SG cross-border trade
+
+shipping:
+  base_fee_sgd: 4.0      # Base shipping fee in SGD
+  step_grams: 500        # Weight bracket size in grams
+  per_step_sgd: 3.5      # Additional fee per bracket
+
+weights_g:
+  default_packaging_g: 120
+  by_size:
+    50: 280              # 50ml bottle + packaging
+    60: 320              # 60ml bottle + packaging
+    90: 420              # 90ml bottle + packaging
+    100: 460             # 100ml bottle + packaging
+
+gst:
+  basis: "declared_value"  # "declared_value" or "target_sg_price"

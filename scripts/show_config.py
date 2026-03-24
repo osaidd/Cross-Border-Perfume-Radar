@@ -1,3 +1,4 @@
+"""Print resolved configuration (cost rules + env variables) to stdout."""
 import sys
 import os
 

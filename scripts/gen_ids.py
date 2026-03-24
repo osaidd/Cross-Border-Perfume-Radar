@@ -1,3 +1,4 @@
+"""Regenerate product_id column in products.csv using deterministic SHA-1 hashes."""
 import pandas as pd
 from etl.id_utils import make_product_id
 

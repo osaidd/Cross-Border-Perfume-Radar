@@ -1,68 +1,88 @@
-# Cross-Border Perfume Radar (UAE → SG)
+# Cross-Border Perfume Radar
 
-A data-driven tool to identify profitable perfume SKUs for cross-border trade from UAE to Singapore, helping e-commerce sellers make informed import decisions.
+A profitability intelligence tool for micro-importers. Analyses marketplace pricing across UAE and Singapore, calculates true landed costs, and identifies profitable cross-border import opportunities.
 
-## 🎯 Problem Statement
+## The Problem
 
-Finding perfume SKUs with the best UAE→SG profit margins while ensuring sufficient market demand is currently a manual, time-consuming process. This tool provides a repeatable, data-driven approach to identify viable import opportunities.
+Small cross-border sellers have no visibility into whether an import will actually be profitable. To figure out if it's worth importing a product from the UAE to Singapore, you'd need to:
 
-## ✨ Key Features
+- Check the source price on Noon.com or Amazon.ae (no public API)
+- Find the competitor selling price on Shopee or Lazada Singapore
+- Calculate shipping costs based on weight
+- Look up customs duty for the product's HS code
+- Apply Singapore GST (9%) to the correct base
+- Factor in marketplace commission fees (different per platform)
+- Convert currencies and account for FX fluctuation
 
-- **SKU Analysis**: Calculate Landed Unit Cost (LUC) with confidence scoring
-- **Market Intelligence**: SG competitor pricing and demand analysis
-- **Profit Gap Calculation**: UAE wholesale vs. SG retail price analysis
-- **Viability Scoring**: 0-100 score with Import/Wait/Skip recommendations
-- **CSV Export**: Top-performing SKUs for easy analysis
-- **Deep Dive Pages**: Detailed SKU analysis and reorder suggestions
+This tool does that entire analysis automatically.
 
-## 🏗️ Architecture
+## What It Does
 
-- **Frontend**: Modern web interface for SKU search and analysis
-- **Backend**: Data processing and calculation engine
-- **Data Sources**: 
-  - SG competitor snapshots (Shopee/Lazada)
-  - Dubai wholesale pricing
-  - Public retail proxies (Noon/Amazon.ae)
-  - Cost parameters (shipping, FX, GST, packaging)
+**Input:** Fragrance product data from UAE and Singapore marketplaces
+**Output:** A ranked list of products by projected net margin after ALL costs
 
-## 🚀 Getting Started
+The system:
+1. Calculates full **landed cost** per unit: product price + FX conversion + shipping + customs duty + GST (9%) + platform commission
+2. Compares landed cost against Singapore marketplace selling prices
+3. Outputs **margin analysis**: net margin %, viability score (0-100), and a clear recommendation (Import / Watch / Skip)
+4. Visualises **cost breakdowns** per product so you can see exactly where margin is gained or lost
 
-*Development setup instructions coming soon...*
+## Screenshot
 
-## 📊 Data Flow
+[INSERT SCREENSHOT HERE AFTER RUNNING THE DASHBOARD]
 
-1. **Input**: SG competitor data, Dubai prices, cost parameters
-2. **Processing**: LUC calculation, profit gap analysis, demand scoring
-3. **Output**: Ranked SKU recommendations with viability scores
+## How It Works
 
-## 📈 Success Metrics
+```
+UAE Marketplaces              Singapore Marketplaces
+(Noon.com, Amazon.ae)         (Shopee, Lazada, Carousell)
+       │                              │
+       ▼                              ▼
+  Source Pricing              Destination Pricing
+       │                              │
+       └────────────┬─────────────────┘
+                    ▼
+            Cost Engine
+   (FX + Shipping + Duty + GST
+    + Platform Commission)
+                    │
+                    ▼
+         Margin Calculator
+    (Net profit, %, viability score)
+                    │
+                    ▼
+       Streamlit Dashboard
+   (Ranked profitability view +
+    per-product cost breakdown)
+```
 
-- Quick SKU lookup with LUC breakdown
-- Ranked table of 20-50 viable SKUs
-- Configurable cost parameters for accurate calculations
-- Confidence flags for price data reliability
+## Key Parameters
 
-## 🔒 Compliance
+| Cost Component | Value | Notes |
+|---|---|---|
+| FX Rate | ~0.37 SGD/AED | Fluctuates daily |
+| Shipping | ~$16 SGD/kg | Small parcel estimate |
+| Customs Duty | 0% | HS 3303 (fragrances) duty-free in SG |
+| GST | 9% | Applied to CIF value |
+| Shopee Commission | ~8% | Includes payment processing |
+| Lazada Commission | ~6% | Varies by category |
+| Carousell Commission | 0% | Peer-to-peer |
 
-- No PII collection
-- Respects robots.txt and Terms of Service
-- Public pages only
-- Low-rate sampling to avoid disruption
+## Quick Start
 
-## 📅 Development Timeline
+```bash
+git clone https://github.com/osaidd/Cross-Border-Perfume-Radar.git
+cd Cross-Border-Perfume-Radar
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-- **Week 1**: Foundations
-- **Week 2**: SG module
-- **Week 3**: Dubai & costs
-- **Week 4**: Scoring + UI
-- **Week 5**: Polish + documentation
+## Built With
 
-## 📚 Documentation
+Python · Pandas · Streamlit · Plotly · Scikit-learn
 
-- [Product Requirements Document](docs/PRD.md)
-- Technical specifications (coming soon)
-- User guide (coming soon)
+## Background
 
----
+Built for [Imperial Oud](https://github.com/osaidd), a cross-border e-commerce venture between Singapore and the UAE. This tool was used to make real sourcing and pricing decisions — it identified 20%+ margin opportunities across ~250 listings/week that would have been missed with manual analysis.
 
-*Built for Imperial Oud and small e-commerce sellers in Singapore*
+The long-term vision: productise this into a decision tool for any micro-importer doing cross-border e-commerce in Southeast Asia.

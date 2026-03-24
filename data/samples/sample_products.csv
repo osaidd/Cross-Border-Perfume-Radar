@@ -1,0 +1,26 @@
+product_id,product_name,brand,volume_ml,uae_source,uae_price_aed,sg_marketplace,sg_selling_price_sgd,weight_g,hs_code,category
+f325f9cc5b7e,Lattafa Raghba,Lattafa,100,noon.com,40,shopee,38.90,460,3303,fragrance
+55af17b17c17,Lattafa Fakhar,Lattafa,100,amazon.ae,35,lazada,35.90,460,3303,fragrance
+aab9d65ffdd2,Afnan 9PM,Afnan,100,noon.com,38,shopee,42.00,460,3303,fragrance
+d00e7a7cfe0c,Maison Alhambra Jean Lowe Immortal,Maison Alhambra,100,noon.com,32,carousell,30.00,460,3303,fragrance
+b8894dd4a3fd,Lattafa Asad,Lattafa,100,amazon.ae,42,shopee,45.00,460,3303,fragrance
+590dbec84fb4,Armaf Tres Nuit,Armaf,100,noon.com,38,lazada,39.90,460,3303,fragrance
+8d2c7ba77d7a,Rasasi Hawas,Rasasi,100,noon.com,45,shopee,48.00,460,3303,fragrance
+6c068030ad9f,Ajmal Evoke Gold,Ajmal,75,amazon.ae,30,carousell,28.00,380,3303,fragrance
+eaf83398ac33,Lattafa Yara Moi,Lattafa,100,noon.com,35,shopee,39.90,460,3303,fragrance
+fecbc879ba70,Armaf Club de Nuit Intense,Armaf,100,noon.com,85,shopee,58.00,460,3303,fragrance
+54347814e380,Lattafa Khamrah,Lattafa,100,amazon.ae,55,shopee,39.90,460,3303,fragrance
+c3d321f946e3,Al Haramain L'Aventure,Al Haramain,100,noon.com,65,lazada,42.00,460,3303,fragrance
+cdcb852c4e99,Swiss Arabian Shaghaf Oud,Swiss Arabian,75,noon.com,60,shopee,38.00,380,3303,fragrance
+e62d0b727a71,Rasasi La Yuqawam,Rasasi,75,amazon.ae,80,lazada,48.00,380,3303,fragrance
+dd85796edb2d,Ajmal Shadow,Ajmal,75,noon.com,55,shopee,35.00,380,3303,fragrance
+3ea04411b6f4,Lattafa Yara,Lattafa,100,noon.com,55,shopee,38.00,460,3303,fragrance
+b7cb049e0339,Maison Alhambra Encode Blue,Maison Alhambra,100,amazon.ae,45,shopee,32.90,460,3303,fragrance
+d5b9f5712286,Armaf Milestone,Armaf,100,noon.com,50,lazada,35.00,460,3303,fragrance
+48c6bfb83323,Al Haramain Amber Oud Gold,Al Haramain,100,noon.com,180,shopee,89.00,460,3303,fragrance
+cdaadbfb3794,Swiss Arabian Cashew,Swiss Arabian,50,amazon.ae,95,lazada,42.00,280,3303,fragrance
+fac3beafbf5c,Al Haramain Detour Noir,Al Haramain,100,noon.com,120,shopee,55.00,460,3303,fragrance
+c049f7f8ffd6,Rasasi Shuhrah,Rasasi,75,amazon.ae,90,shopee,42.00,380,3303,fragrance
+9e83734f7f8a,Armaf Ventana,Armaf,100,noon.com,110,lazada,49.90,460,3303,fragrance
+24bb9f272763,Lattafa Bade'e Al Oud Amethyst,Lattafa,100,noon.com,75,shopee,42.00,500,3303,fragrance
+1e535fa9e656,Al Haramain Junoon,Al Haramain,75,amazon.ae,70,shopee,38.00,420,3303,fragrance

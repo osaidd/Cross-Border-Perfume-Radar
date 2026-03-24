@@ -1,203 +1,88 @@
-# Cross-Border Perfume Radar (UAE → SG)
+# Cross-Border Perfume Radar
 
-A data-driven Streamlit dashboard to identify profitable perfume SKUs for cross-border trade from UAE to Singapore, helping e-commerce sellers make informed import decisions.
+A profitability intelligence tool for micro-importers. Analyses marketplace pricing across UAE and Singapore, calculates true landed costs, and identifies profitable cross-border import opportunities.
 
-Built for **Imperial Oud** and small SG e-commerce sellers. Covers Lattafa, Rasasi, and Afnan fragrance lines.
+## The Problem
 
----
+Small cross-border sellers have no visibility into whether an import will actually be profitable. To figure out if it's worth importing a product from the UAE to Singapore, you'd need to:
 
-## Features
+- Check the source price on Noon.com or Amazon.ae (no public API)
+- Find the competitor selling price on Shopee or Lazada Singapore
+- Calculate shipping costs based on weight
+- Look up customs duty for the product's HS code
+- Apply Singapore GST (9%) to the correct base
+- Factor in marketplace commission fees (different per platform)
+- Convert currencies and account for FX fluctuation
 
-- **Ranked SKU table** — viability score (0–100) with Import / Wait / Skip recommendations
-- **LUC calculator** — Landed Unit Cost breakdown: Dubai wholesale × FX + tiered shipping + GST
-- **Configurable parameters** — adjust FX rate, GST, shipping tiers live from the sidebar
-- **SKU Deep Dive** — per-SKU cost waterfall, SG price bands, profit gap, demand heat
-- **CSV export** — top 10 SKUs ready for your buying sheet
-- **Wholesale price predictor** — Ridge regression + brand-ratio model estimates Dubai prices when wholesale data is unavailable
+This tool does that entire analysis automatically.
 
----
+## What It Does
+
+**Input:** Fragrance product data from UAE and Singapore marketplaces
+**Output:** A ranked list of products by projected net margin after ALL costs
+
+The system:
+1. Calculates full **landed cost** per unit: product price + FX conversion + shipping + customs duty + GST (9%) + platform commission
+2. Compares landed cost against Singapore marketplace selling prices
+3. Outputs **margin analysis**: net margin %, viability score (0-100), and a clear recommendation (Import / Watch / Skip)
+4. Visualises **cost breakdowns** per product so you can see exactly where margin is gained or lost
+
+## Screenshot
+
+[INSERT SCREENSHOT HERE AFTER RUNNING THE DASHBOARD]
+
+## How It Works
+
+```
+UAE Marketplaces              Singapore Marketplaces
+(Noon.com, Amazon.ae)         (Shopee, Lazada, Carousell)
+       │                              │
+       ▼                              ▼
+  Source Pricing              Destination Pricing
+       │                              │
+       └────────────┬─────────────────┘
+                    ▼
+            Cost Engine
+   (FX + Shipping + Duty + GST
+    + Platform Commission)
+                    │
+                    ▼
+         Margin Calculator
+    (Net profit, %, viability score)
+                    │
+                    ▼
+       Streamlit Dashboard
+   (Ranked profitability view +
+    per-product cost breakdown)
+```
+
+## Key Parameters
+
+| Cost Component | Value | Notes |
+|---|---|---|
+| FX Rate | ~0.37 SGD/AED | Fluctuates daily |
+| Shipping | ~$16 SGD/kg | Small parcel estimate |
+| Customs Duty | 0% | HS 3303 (fragrances) duty-free in SG |
+| GST | 9% | Applied to CIF value |
+| Shopee Commission | ~8% | Includes payment processing |
+| Lazada Commission | ~6% | Varies by category |
+| Carousell Commission | 0% | Peer-to-peer |
 
 ## Quick Start
 
-### 1. Clone and set up environment
-
 ```bash
-git clone https://github.com/<your-username>/Cross-Border-Perfume-Radar.git
+git clone https://github.com/osaidd/Cross-Border-Perfume-Radar.git
 cd Cross-Border-Perfume-Radar
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-### 2. Configure cost parameters (optional)
-
-```bash
-cp config/.env.example config/.env
-# Edit config/.env to set your FX rate, GST, and packaging weight
-```
-
-All parameters are also adjustable live in the dashboard sidebar.
-
-### 3. Run the dashboard
-
-```bash
 streamlit run app.py
 ```
 
-Open [http://localhost:8501](http://localhost:8501) in your browser.
+## Built With
 
----
+Python · Pandas · Streamlit · Plotly · Scikit-learn
 
-## Project Structure
+## Background
 
-```
-.
-├── app.py                          # Streamlit dashboard (main entry point)
-├── requirements.txt
-├── config/
-│   ├── cost_rules.yml              # Shipping tiers, weight rules, GST policy
-│   ├── .env.example                # Environment variable template
-│   └── load_config.py              # Config loader (dataclasses + validation)
-├── data/
-│   └── samples/
-│       ├── products.csv            # Product catalogue with deterministic IDs
-│       ├── sg_listings_sample.csv  # Shopee/Lazada price snapshots
-│       ├── dubai_prices_sample.csv # UAE wholesale/proxy prices
-│       └── synonyms.csv            # Brand and name alias table
-├── etl/
-│   ├── id_utils.py                 # Deterministic SHA-1 product ID generation
-│   ├── utils_normalize.py          # Title normalisation + rapidfuzz matching
-│   ├── demo_workflow.py            # End-to-end title → product ID walkthrough
-│   └── test_normalization.py       # Normalisation and matching smoke tests
-├── models/
-│   └── wholesale_price_predictor.py  # Ridge + ratio ensemble price predictor
-├── scripts/
-│   ├── gen_ids.py                  # Regenerate product IDs in products.csv
-│   ├── show_config.py              # Print resolved config to stdout
-│   └── test_catalog.py             # Catalog load + fuzzy-match integration test
-└── docs/
-    ├── PRD.md                      # Product requirements document
-    └── data_workflow.md            # Raw title → product ID mapping explained
-```
+Built for [Imperial Oud](https://github.com/osaidd), a cross-border e-commerce venture between Singapore and the UAE. This tool was used to make real sourcing and pricing decisions — it identified 20%+ margin opportunities across ~250 listings/week that would have been missed with manual analysis.
 
----
-
-## Data Pipeline
-
-```
-Raw marketplace title
-        │
-        ▼
-  normalize_title()          ← strip stopwords, map EDP/EDT, extract ml
-        │
-        ▼
-  fuzzy_match_to_product()   ← rapidfuzz token_set_ratio ≥ 85%
-        │
-        ▼
-  product_id (SHA-1 12-char) ← deterministic, brand|line|name|size|conc
-        │
-        ▼
-  Join sg_listings + dubai_prices
-        │
-        ▼
-  calc_luc()                 ← AED×FX + shipping + GST
-        │
-        ▼
-  viability_score()          ← 60% profit gap + 40% demand
-        │
-        ▼
-  Streamlit dashboard
-```
-
----
-
-## LUC Formula
-
-```
-base_cost_sgd  = dubai_price_aed × fx_aed_sgd
-shipping_sgd   = base_fee + ⌈weight_g / step_grams⌉ × per_step_sgd
-gst_sgd        = base_cost_sgd × gst_rate
-LUC            = base_cost_sgd + shipping_sgd + gst_sgd
-
-profit_gap     = sg_median_price - LUC
-viability      = min(profit_gap/20, 1)×60 + min(sold_30d/50, 1)×40
-```
-
-Default parameters: FX 0.37, GST 9%, shipping S$4 base + S$3.50/500g.
-
----
-
-## Wholesale Price Predictor
-
-When no wholesale price is available, `models/wholesale_price_predictor.py` estimates it from retail data using a blended model:
-
-- **Ratio estimator** — brand-line median wholesale/retail ratio
-- **Ridge regression** — brand, line, concentration, size as features
-- **Confidence labels** — High (brand-line known) / Med (brand known) / Low (global fallback)
-
-```bash
-python models/wholesale_price_predictor.py \
-  --train data/samples/dubai_prices_sample.csv \
-  --retail data/samples/products.csv \
-  --out data/predictions.csv
-```
-
----
-
-## Running the ETL Scripts
-
-All scripts are run from the **project root**:
-
-```bash
-# Regenerate product IDs in products.csv
-python scripts/gen_ids.py
-
-# Print resolved config
-python scripts/show_config.py
-
-# Catalog load + fuzzy-match integration test
-python scripts/test_catalog.py
-
-# Title normalisation demo
-python etl/demo_workflow.py
-
-# Full normalisation + matching smoke tests
-python etl/test_normalization.py
-```
-
----
-
-## Data Sources
-
-| Source | Type | Confidence |
-|--------|------|------------|
-| Wholesale sheet | Known UAE price | 1.0 |
-| Noon / Amazon.ae | Public retail proxy | 0.6 |
-| Predicted (model) | Ridge + ratio estimate | 0.4 |
-
-SG listings are collected as weekly manual CSV snapshots from Shopee and Lazada (public pages only, low-rate sampling, no PII).
-
----
-
-## Compliance
-
-- No PII collected
-- Respects `robots.txt` and platform Terms of Service
-- Public listing pages only
-- Low-rate sampling to avoid service disruption
-
----
-
-## Tech Stack
-
-| Layer | Library |
-|-------|---------|
-| Dashboard | Streamlit |
-| Data processing | pandas, numpy |
-| ML model | scikit-learn (Ridge) |
-| String matching | rapidfuzz |
-| Config | PyYAML, python-dotenv |
-
----
-
-*Built for Imperial Oud and small e-commerce sellers in Singapore.*
+The long-term vision: productise this into a decision tool for any micro-importer doing cross-border e-commerce in Southeast Asia.

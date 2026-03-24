@@ -1,3 +1,4 @@
+"""Deterministic SHA-1 product ID generation from brand/line/name/size/concentration."""
 import hashlib
 
 def make_product_id(brand:str, line:str, name:str, size_ml:int, concentration:str)->str:

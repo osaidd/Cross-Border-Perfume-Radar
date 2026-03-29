@@ -27,6 +27,32 @@ The system:
 3. Outputs **margin analysis**: net margin %, viability score (0-100), and a clear recommendation (Import / Watch / Skip)
 4. Visualises **cost breakdowns** per product so you can see exactly where margin is gained or lost
 
+## Dashboard
+
+### Top Opportunities
+Highest-margin products surfaced automatically with true margin after all costs.
+
+<img width="536" alt="Top Opportunities" src="https://github.com/user-attachments/assets/3e206667-7482-4df2-a863-6a610a674062" />
+
+### Filterable Table with CSV Export
+Full ranked table with marketplace, source, and recommendation filters.
+
+<img width="522" alt="Filterable Table" src="https://github.com/user-attachments/assets/97b8ceb5-8a90-4000-b5cb-f7552a3f071f" />
+
+### Product Deep Dive and Optimal Sourcing Route
+Per-product cost waterfall and cross-platform profit comparison.
+
+<img width="598" alt="Product Deep Dive" src="https://github.com/user-attachments/assets/c6b6c51a-0ab1-4198-bb94-3d7199da4634" />
+
+<img width="597" alt="Optimal Sourcing Route" src="https://github.com/user-attachments/assets/26b1c37d-d0af-4d5d-985c-2c5c4d0c5513" />
+
+### Tweakable FX and Commission Rates
+Adjust FX rate, GST, shipping, and per-platform fees live from the sidebar.
+
+<img width="585" alt="Settings" src="https://github.com/user-attachments/assets/0766495f-5515-458d-b754-2fab5cf1db62" />
+
+---
+
 ## How It Works
 
 ```

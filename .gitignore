@@ -30,3 +30,6 @@ data/predictions.csv
 .DS_Store
 data/raw/*
 data/processed/*
+
+# Claude internal
+.claude/

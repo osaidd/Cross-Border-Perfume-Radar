@@ -133,6 +133,7 @@ When no wholesale price is available, `models/wholesale_price_predictor.py` esti
 
 - **Ratio estimator** — brand-line median wholesale/retail ratio
 - **Ridge regression** — brand, line, concentration, size as features
+- **Random Forest** — same feature set, blended 40/30/30 with ratio and Ridge
 - **Confidence labels** — High (brand-line known) / Med (brand known) / Low (global fallback)
 
 ```bash
@@ -140,6 +141,13 @@ python models/wholesale_price_predictor.py \
   --train data/samples/dubai_prices_sample.csv \
   --retail data/samples/products.csv \
   --out data/predictions.csv
+
+# Run hold-out evaluation (meaningful on full 1,500+ row dataset)
+python models/wholesale_price_predictor.py \
+  --train data/samples/dubai_prices_sample.csv \
+  --retail data/samples/products.csv \
+  --out data/predictions.csv \
+  --evaluate
 ```
 
 ---
@@ -164,6 +172,12 @@ python etl/demo_workflow.py
 # Full normalisation + matching smoke tests
 python etl/test_normalization.py
 ```
+
+---
+
+## Data
+
+Sample files in `data/samples/` contain a curated subset for demo purposes. The full dataset used during active trading comprised 1,500+ records collected weekly from Shopee and Lazada public listing pages (Oct 2024 – Jan 2025). UAE prices were sourced from supplier wholesale sheets and cross-referenced against Noon.com and Amazon.ae public retail listings using `scrapers/noon_scraper.py`.
 
 ---
 

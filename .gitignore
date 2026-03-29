@@ -1,7 +1,29 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
-.env
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+config/.env
+
+# Data artefacts
+data/raw/
+data/processed/
+data/predictions.csv
 *.parquet
-data/raw/*
-data/processed/*
+
+# IDE
+.vscode/
+.idea/
+*.swp

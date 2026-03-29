@@ -54,13 +54,19 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 .
 ├── app.py                          # Streamlit dashboard (main entry point)
 ├── requirements.txt
+├── .gitignore
 ├── config/
 │   ├── cost_rules.yml              # Shipping tiers, weight rules, GST policy
 │   ├── .env.example                # Environment variable template
 │   └── load_config.py              # Config loader (dataclasses + validation)
+├── src/
+│   └── cost_engine.py              # Landed-cost + profitability calculator
+├── scrapers/
+│   ├── noon_scraper.py             # Noon.com UAE scraper (BeautifulSoup + requests)
+│   └── shopee_scraper.py           # Shopee SG scraper (Selenium WebDriver)
 ├── data/
 │   └── samples/
-│       ├── products.csv            # Product catalogue with deterministic IDs
+│       ├── products.csv            # 100+ product catalogue with SHA-1 IDs
 │       ├── sg_listings_sample.csv  # Shopee/Lazada price snapshots
 │       ├── dubai_prices_sample.csv # UAE wholesale/proxy prices
 │       └── synonyms.csv            # Brand and name alias table
@@ -70,11 +76,14 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 │   ├── demo_workflow.py            # End-to-end title → product ID walkthrough
 │   └── test_normalization.py       # Normalisation and matching smoke tests
 ├── models/
-│   └── wholesale_price_predictor.py  # Ridge + ratio ensemble price predictor
+│   └── wholesale_price_predictor.py  # Ridge + RF + ratio ensemble predictor
 ├── scripts/
 │   ├── gen_ids.py                  # Regenerate product IDs in products.csv
 │   ├── show_config.py              # Print resolved config to stdout
 │   └── test_catalog.py             # Catalog load + fuzzy-match integration test
+├── tests/
+│   ├── test_scraper.py             # Noon scraper unit tests
+│   └── test_predictor.py           # Wholesale predictor unit tests
 └── docs/
     ├── PRD.md                      # Product requirements document
     └── data_workflow.md            # Raw title → product ID mapping explained
@@ -208,7 +217,9 @@ SG listings are collected as weekly manual CSV snapshots from Shopee and Lazada 
 |-------|---------|
 | Dashboard | Streamlit |
 | Data processing | pandas, numpy |
-| ML model | scikit-learn (Ridge) |
+| ML model | scikit-learn (Ridge, Random Forest) |
+| Scraping (UAE) | BeautifulSoup, requests |
+| Scraping (SG) | Selenium WebDriver |
 | String matching | rapidfuzz |
 | Config | PyYAML, python-dotenv |
 

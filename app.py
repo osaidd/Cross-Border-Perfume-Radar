@@ -203,8 +203,8 @@ display_cols = ["SKU", "Dubai AED", "Confidence", "LUC (SGD)", "SG Median",
 styled = (
     df[display_cols]
     .style
-    .applymap(colour_score, subset=["Score"])
-    .applymap(colour_gap, subset=["Profit Gap"])
+    .map(colour_score, subset=["Score"])
+    .map(colour_gap, subset=["Profit Gap"])
     .format({
         "Dubai AED": "{:.2f}",
         "LUC (SGD)": "S${:.2f}",
@@ -282,7 +282,8 @@ st.markdown(
 
 st.markdown("---")
 st.caption(
-    "Data: Shopee/Lazada manual samples (Jan 2024) · Dubai wholesale prices · "
+    "Built for Imperial Oud | Cross-border pricing intelligence for micro-importers · "
+    "Data: Shopee/Lazada samples (Aug 2025) · Dubai wholesale prices · "
     "LUC = AED×FX + tiered shipping + GST · "
     "Score = 60% profit weight + 40% demand weight"
 )

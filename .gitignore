@@ -27,9 +27,6 @@ data/predictions.csv
 .vscode/
 .idea/
 *.swp
-.DS_Store
-data/raw/*
-data/processed/*
 
 # Claude internal
 .claude/

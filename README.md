@@ -27,10 +27,6 @@ The system:
 3. Outputs **margin analysis**: net margin %, viability score (0-100), and a clear recommendation (Import / Watch / Skip)
 4. Visualises **cost breakdowns** per product so you can see exactly where margin is gained or lost
 
-## Screenshot
-
-[INSERT SCREENSHOT HERE AFTER RUNNING THE DASHBOARD]
-
 ## How It Works
 
 ```

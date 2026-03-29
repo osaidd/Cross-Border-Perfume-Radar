@@ -1,9 +1,103 @@
 product_id,brand,line,name,size_ml,concentration,notes
+0449f8ebf405,Lattafa,Raghba,Raghba,100,EDP,Budget-friendly crowd pleaser
+0492df35191e,Afnan,9PM,9PM,100,EDP,Evening wear fragrance
+06500acad195,Lattafa,Yara,Yara,100,EDP,Fruity floral
+07cb36dca443,Armaf,Tres Nuit,Tres Nuit,100,EDT,Light clean fougere
+17185657015,Maison Alhambra,Porto Neroli,Porto Neroli,100,EDP,Fresh citrus neroli
+1762134e8119,Lattafa,Opulent Dubai,Opulent Dubai,100,EDP,Woody amber
+182144a848a1,Lattafa,Velvet Oud,Velvet Oud,100,EDP,Smooth dark oud
+1fcd4e2d7930,Lattafa,Fakhar Silver,Fakhar Silver,100,EDP,Fresh fougere
+249097c93d65,Armaf,Club de Nuit Sillage,Club de Nuit Sillage,105,EDP,Smoky floral
+26292ca0b2e8,Afnan,Supremacy Noir,Supremacy Noir,100,EDP,Dark oriental
+2a079e34a12b,Lattafa,Opulent Musk,Opulent Musk,100,EDP,Clean white musk
+2c7dfd105a07,Rasasi,Blue Lady,Blue Lady,100,EDP,Aquatic floral feminine
+2d9358dbcd22,Rasasi,Hawas,Hawas,100,EDP,Fresh aquatic
+2eaa485e65f3,Ard Al Zaafaran,Dirham,Dirham,100,EDP,Powdery oriental icon
+372f2d16710f,Armaf,Club de Nuit Milestone,Club de Nuit Milestone,105,EDP,Fresh woody
+3d1ca7204044,Maison Alhambra,Victorioso,Victorioso,100,EDP,Fresh masculine sport
+4db0d1bfe86c,Lattafa,The Kingdom,The Kingdom,100,EDP,Rich royal oud
 533d4f17db40,Lattafa,Khamrah,Khamrah,100,EDP,Popular gourmand fragrance
 55212edf54e5,Lattafa,Asad,Asad,100,EDP,Bold woody-amber
-2d9358dbcd22,Rasasi,Hawas,Hawas,100,EDP,Fresh aquatic
-0492df35191e,Afnan,9PM,9PM,100,EDP,Evening wear fragrance
-a23cef909263,Lattafa,Ana Abiyedh,Ana Abiyedh,60,EDP,Floral white musk
+5826f9960bf9,Lattafa,Victoria,Victoria,100,EDP,Feminine floral
+58a82a22865d,Lattafa,Habib,Habib,100,EDP,Warm oriental
+5b8d797bfb64,Armaf,Club de Nuit Urban Elixir,Club de Nuit Urban Elixir,105,EDP,Smoky citrus elixir
+669c9bc411f8,Afnan,Turathi Brown,Turathi Brown,90,EDP,Warm spiced oriental
+67a7e7feea27,Lattafa,Oud Mood,Oud Mood,100,EDP,Accessible oud
+7bf737bd93a4,Lattafa,Qaed Al Fursan,Qaed Al Fursan,100,EDP,Fresh masculine
+809f458f2d42,Afnan,Supremacy in Oud,Supremacy in Oud,100,EDP,Rich oud intense
+877c757a3c2e,Lattafa,Bade'e Al Oud,Bade'e Al Oud (Oud for Glory),100,EDP,Classic Lattafa oud
 8b3a1af59c40,Afnan,Supremacy Silver,Supremacy Silver,100,EDP,Fresh fougere
+8c42bcee926b,Armaf,Club de Nuit Intense Woman,Club de Nuit Intense Woman,105,EDP,Fresh floral fruity
+94dd3bc914d2,Lattafa,Opulent Oud,Opulent Oud,100,EDP,Dark rich oud
+95ebbeba225f,Rasasi,La Yuqawam Femme,La Yuqawam Femme,75,EDP,Warm floral feminine
 a07501b2b9e9,Rasasi,Shuhrah,Shuhrah,90,EDP,Rich oriental
-06500acad195,Lattafa,Yara,Yara,100,EDP,Fruity floral
+a23cef909263,Lattafa,Ana Abiyedh,Ana Abiyedh,60,EDP,Floral white musk
+af1c76bdde42,Lattafa,Musamam White Intense,Musamam White Intense,100,EDP,White musk intense
+b3e770259342,Afnan,Supremacy Not Only Intense,Supremacy Not Only Intense,100,EDP,Bold intense oriental
+c0f23a521caf,Lattafa,Ramz Silver,Ramz Silver,100,EDP,Fresh powdery
+c1629826f9a2,Lattafa,Eclaire,Eclaire,100,EDP,Fresh floral
+c24d2e5a9a64,Lattafa,Bade'e Al Oud Amethyst,Bade'e Al Oud Amethyst,100,EDP,Fruity oud blend
+c3f317f7f404,Maison Alhambra,Kismet,Kismet,100,EDP,Floral woody
+c6a8e12250f2,Armaf,Club de Nuit Intense Man,Club de Nuit Intense Man,105,EDP,Fresh citrus powerhouse
+d59f0a4e0b07,Afnan,9AM,9AM,100,EDP,Daytime citrus fresh
+d8ced98a3377,Rasasi,Daarej Pour Femme,Daarej Pour Femme,100,EDP,Floral feminine
+dc7cec2204c7,Afnan,Rare Carbon,Rare Carbon,100,EDP,Dark woody carbon
+dd1679372105,Lattafa,Najdia,Najdia,100,EDP,Powdery oriental
+e061c0f9af91,Armaf,Le Parfait,Le Parfait,100,EDP,Warm oriental spice
+e810b833355b,Afnan,Turathi Blue,Turathi Blue,90,EDP,Fresh aquatic oriental
+ec1fb228bb1f,Ard Al Zaafaran,Jazzab Silver,Jazzab Silver,100,EDP,Fresh clean silver
+fa9f813fbbeb,Lattafa,Ameer Al Oudh Intense Oud,Ameer Al Oudh Intense Oud,100,EDP,Intense oud
+62acd292a311,Lattafa,Khamrah Qahwa,Khamrah Qahwa,100,EDP,Coffee gourmand variant
+38bef5db92f2,Lattafa,Yara Moi,Yara Moi,100,EDP,Lighter floral Yara
+1f067678cc3f,Lattafa,Yara Tous,Yara Tous,100,EDP,Fruity Yara variant
+9a5694e1c30c,Lattafa,Asad Zanzibar,Asad Zanzibar,100,EDP,Tropical Asad variant
+dc9f6fcf52d5,Lattafa,Raghba Wood Intense,Raghba Wood Intense,100,EDP,Woody intense variant
+ed2ac0d39564,Lattafa,Fakhar,Fakhar,100,EDP,Oriental pride fragrance
+c3c1fe2f3d42,Lattafa,Fakhar Gold,Fakhar Gold,100,EDP,Premium oriental
+451103c2004d,Lattafa,Haya,Haya,100,EDP,Feminine floral
+015d4a6728de,Lattafa,Mayar,Mayar,100,EDP,Fresh feminine
+232144c0ebb8,Lattafa,Al Qiam Gold,Al Qiam Gold,100,EDP,Rich oud gold
+7430c34924f0,Lattafa,Al Qiam Silver,Al Qiam Silver,100,EDP,Fresh clean oud
+16d41ee71cb2,Lattafa,Ejaazi,Ejaazi,100,EDP,Warm spiced amber
+be6a2956a1c7,Lattafa,Ejaazi Intensive Silver,Ejaazi Intensive Silver,100,EDP,Fresh silver variant
+b41b88fed780,Lattafa,Bade e Al Oud Sublime,Bade e Al Oud Sublime,100,EDP,Sublime oud variant
+c0cd610623dd,Lattafa,Opulent Gold,Opulent Gold,100,EDP,Gold amber blend
+3a0f2ede23b3,Lattafa,Oud Mood Reminiscence,Oud Mood Reminiscence,100,EDP,Warm oud memory
+84a84d1484b6,Lattafa,Oud Mood Gold,Oud Mood Gold,100,EDP,Gold oud variant
+6ad47baf12d9,Lattafa,Qaed Al Fursan Unlimited,Qaed Al Fursan Unlimited,100,EDP,Fresh intense masculine
+bf377a3c8528,Lattafa,Teriaq,Teriaq,100,EDP,Bold sweet amber
+c448e7141e78,Lattafa,Hayaati Florence,Hayaati Florence,100,EDP,Italian inspired floral
+4e99a9d3cdc4,Lattafa,Nebras,Nebras,100,EDP,Warm oriental amber
+98e4be9996f1,Lattafa,Ana Abiyedh Rouge,Ana Abiyedh Rouge,100,EDP,Red berry musk
+9350d142c4aa,Rasasi,Hawas Ice,Hawas Ice,100,EDP,Fresh aquatic ice
+da12d1ddd08f,Rasasi,La Yuqawam Homme,La Yuqawam Homme,75,EDP,Woody leather masculine
+b429adba5840,Rasasi,Rumz Al Rasasi 9325,Rumz Al Rasasi 9325,50,EDP,Feminine floral musk
+95c5daa58420,Rasasi,Qasamat Morhaf,Qasamat Morhaf,65,EDP,Rich spiced amber
+e1555f49c0af,Rasasi,Qasamat Rasana,Qasamat Rasana,65,EDP,Sweet fruity floral
+ff946359ff22,Rasasi,Egra,Egra,100,EDP,Fresh citrus masculine
+98d2435b4fd7,Rasasi,Fattan Pour Homme,Fattan Pour Homme,50,EDP,Classic masculine
+7c6ae8040f35,Rasasi,Chastity,Chastity,100,EDP,Clean white floral
+cfe9b8181505,Afnan,9PM Rebel,9PM Rebel,100,EDP,Bold evening variant
+dd168481c4a4,Afnan,9AM Dive,9AM Dive,100,EDP,Aquatic morning fresh
+314b55eac080,Afnan,Supremacy Gold,Supremacy Gold,100,EDP,Warm gold oriental
+3426455ae787,Afnan,Supremacy Purple,Supremacy Purple,100,EDP,Fruity purple oud
+f64406a9572f,Afnan,Modest Pour Femme,Modest Pour Femme,100,EDP,Elegant feminine
+6d918d8dc50f,Afnan,Rare Tycoon,Rare Tycoon,100,EDP,Luxury masculine
+185a458f27d5,Afnan,Turathi Red,Turathi Red,90,EDP,Warm red spiced
+b50f6e5a8dcb,Afnan,Ornament Pour Homme,Ornament Pour Homme,100,EDP,Fresh masculine
+799dbdf6dbc1,Armaf,Club de Nuit Intense Man Limited Edition,Club de Nuit Intense Man Limited Edition,105,EDP,Premium intense citrus
+f6f452e9b838,Armaf,Ventana Pour Homme,Ventana Pour Homme,100,EDP,Fresh aquatic
+a4b424ce4343,Armaf,Odyssey Homme White Edition,Odyssey Homme White Edition,100,EDP,Clean white masculine
+03276532d278,Armaf,Derby Club House Blanche,Derby Club House Blanche,100,EDT,Light white floral
+0d135717c12d,Armaf,Eternia,Eternia,80,EDP,Sweet amber feminine
+531fb63a7264,Armaf,Tres Nuit Lyric,Tres Nuit Lyric,100,EDP,Evening fougere
+89f5114c6893,Maison Alhambra,Jean Lowe Immortal,Jean Lowe Immortal,100,EDP,Woody amber leather
+94161c2c01e4,Maison Alhambra,Jean Lowe Matiere,Jean Lowe Matiere,100,EDP,Dark amber wood
+badf9960e0c3,Maison Alhambra,Baroque Rouge 540,Baroque Rouge 540,100,EDP,Sweet amber saffron
+216a64f48214,Maison Alhambra,Toro Pour Homme,Toro Pour Homme,100,EDP,Bold fresh masculine
+17c5d1e5e2cf,Maison Alhambra,Encode Blue,Encode Blue,100,EDP,Aquatic blue sport
+e6821f045d76,Ard Al Zaafaran,Oud 24 Hours,Oud 24 Hours,100,EDP,Long lasting oud
+7b47f0c45a3b,Ard Al Zaafaran,Bukhoor,Bukhoor,100,EDP,Smoky woody incense
+8cfdc7cf7076,Ard Al Zaafaran,Ameerat Al Arab,Ameerat Al Arab,100,EDP,Princess feminine rose
+ce78082959b8,Ard Al Zaafaran,Dirham Gold,Dirham Gold,100,EDP,Gold powdery oriental
+203e4d4423bb,Ard Al Zaafaran,Raghba Musky,Raghba Musky,100,EDP,Musky oriental

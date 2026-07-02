@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-from src.cost_engine import (
+from perfume_radar.cost_engine import (
     calculate_landed_cost,
     calculate_profitability,
     calculate_viability_score,

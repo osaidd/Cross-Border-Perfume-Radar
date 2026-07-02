@@ -1,14 +1,10 @@
 """Tests for models/wholesale_price_predictor.py"""
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import io
 from contextlib import redirect_stdout
 
 import pandas as pd
 import numpy as np
-from models.wholesale_price_predictor import (
+from perfume_radar.predictor import (
     prepare_training_pairs,
     train_models,
     predict_for_retail,

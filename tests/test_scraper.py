@@ -1,8 +1,10 @@
 """Smoke tests for scrapers/noon_scraper.py"""
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import pytest
 
+pytest.importorskip("bs4")
+pytest.importorskip("requests")
+
+import os
 import importlib
 import csv
 import tempfile

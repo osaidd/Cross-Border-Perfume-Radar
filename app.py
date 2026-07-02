@@ -10,11 +10,14 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
+from perfume_radar.config import load_config
 from perfume_radar.cost_engine import (
     calculate_landed_cost,
     calculate_profitability,
     calculate_viability_score,
 )
+
+CFG = load_config()
 
 # ── page config ───────────────────────────────────────────────────────────────
 
@@ -29,13 +32,13 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "samples", "sample_p
 # ── defaults ──────────────────────────────────────────────────────────────────
 
 DEFAULTS = {
-    "fx_rate": 0.37,
-    "shipping_per_kg": 16.0,
-    "gst_rate": 0.09,
-    "customs_duty_rate": 0.0,
-    "shopee_fee": 8.0,
-    "lazada_fee": 6.0,
-    "carousell_fee": 0.0,
+    "fx_rate": CFG.fx_aed_sgd,
+    "shipping_per_kg": CFG.shipping_per_kg_sgd,
+    "gst_rate": CFG.gst_rate,
+    "customs_duty_rate": CFG.customs_duty_rate,
+    "shopee_fee": CFG.platform_fees["shopee"] * 100,
+    "lazada_fee": CFG.platform_fees["lazada"] * 100,
+    "carousell_fee": CFG.platform_fees["carousell"] * 100,
     # calculator form
     "calc_product_name": "",
     "calc_brand": "",
@@ -83,7 +86,7 @@ def compute_table(df):
         )
 
         platform = row["sg_marketplace"].lower()
-        fee = fees.get(platform, 0.08)
+        fee = fees.get(platform, CFG.platform_fees["shopee"])
         sg_price = row["sg_selling_price_sgd"]
         platform_fee_sgd = sg_price * fee
         net_profit = sg_price - platform_fee_sgd - lc["total_landed_cost_sgd"]
@@ -92,9 +95,9 @@ def compute_table(df):
         # naive margin: just FX conversion, ignoring all other costs
         naive_margin = ((sg_price - row["uae_price_aed"] * st.session_state.fx_rate) / sg_price * 100) if sg_price > 0 else 0.0
 
-        if net_margin >= 20:
+        if net_margin >= CFG.import_margin_pct:
             rec = "IMPORT"
-        elif net_margin >= 10:
+        elif net_margin >= CFG.watch_margin_pct:
             rec = "WATCH"
         else:
             rec = "SKIP"
@@ -512,7 +515,13 @@ elif page == "Analyse a Product":
             customs_duty_rate=st.session_state.customs_duty_rate,
             gst_rate=st.session_state.gst_rate,
         )
-        prof = calculate_profitability(lc["total_landed_cost_sgd"], sg_price, marketplace)
+        prof = calculate_profitability(lc["total_landed_cost_sgd"], sg_price, marketplace, fees)
+        if prof["net_margin_pct"] >= CFG.import_margin_pct:
+            rec = "IMPORT"
+        elif prof["net_margin_pct"] >= CFG.watch_margin_pct:
+            rec = "WATCH"
+        else:
+            rec = "SKIP"
 
         naive_margin = ((sg_price - uae_price * st.session_state.fx_rate) / sg_price * 100) if sg_price > 0 else 0
         margin_delta = naive_margin - prof["net_margin_pct"]
@@ -533,7 +542,7 @@ elif page == "Analyse a Product":
         m1.metric("Landed Cost", f"S${lc['total_landed_cost_sgd']:.2f}")
         m2.metric("Net Profit", f"S${prof['net_profit_sgd']:.2f}")
         m3.metric("True Margin", f"{prof['net_margin_pct']:.1f}%")
-        m4.metric("Recommendation", prof["recommendation"])
+        m4.metric("Recommendation", rec)
 
         col_chart, col_table = st.columns([3, 2])
 

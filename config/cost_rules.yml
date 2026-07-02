@@ -1,17 +1,40 @@
-# Cost calculation rules for UAE → SG cross-border trade
+# Cross-Border Perfume Radar — cost and scoring rules (single source of defaults).
+# FX_AED_SGD and GST_RATE may be overridden via config/.env.
+
+fx_aed_sgd: 0.37          # SGD per 1 AED
+gst_rate: 0.09            # Singapore GST, applied to CIF + duty
+customs_duty_rate: 0.0    # HS 3303 fragrances are duty-free in SG
 
 shipping:
-  base_fee_sgd: 4.0      # Base shipping fee in SGD
-  step_grams: 500        # Weight bracket size in grams
-  per_step_sgd: 3.5      # Additional fee per bracket
+  per_kg_sgd: 16.0        # linear small-parcel rate
 
-weights_g:
+platform_fees:            # commission incl. payment processing, as fractions
+  shopee: 0.08
+  lazada: 0.06
+  carousell: 0.0
+
+weights_g:                # bottle + retail box + shipping packaging
   default_packaging_g: 120
   by_size:
-    50: 280              # 50ml bottle + packaging
-    60: 320              # 60ml bottle + packaging
-    90: 420              # 90ml bottle + packaging
-    100: 460             # 100ml bottle + packaging
+    40: 230
+    50: 250
+    60: 280
+    75: 320
+    90: 355
+    100: 380
+    105: 395
 
-gst:
-  basis: "declared_value"  # "declared_value" or "target_sg_price"
+matching:
+  fuzzy_threshold: 85     # token_set_ratio score needed to accept a listing match
+
+recommendation:
+  import_margin_pct: 20
+  watch_margin_pct: 10
+
+viability:                # weights must sum to 100
+  margin_weight: 45
+  heat_weight: 35
+  price_weight: 20
+  margin_saturation_pct: 30
+  price_saturation_sgd: 80
+  low_confidence_heat_floor: 0.75

@@ -47,6 +47,12 @@ def test_low_confidence_gate():
     assert recommend(25, CFG, confidence=0.6, heat_percentile=0.1) == "IMPORT"
 
 
+def test_low_confidence_gate_boundary():
+    """Floor is exclusive (`heat_percentile < floor`): at the floor itself, gate doesn't apply."""
+    assert CFG.viability.low_confidence_heat_floor == 0.75
+    assert recommend(25, CFG, confidence=0.4, heat_percentile=0.75) == "IMPORT"
+
+
 def test_margin_based_score_rescaled_to_100():
     assert margin_based_score(30, 80, CFG) == 100.0
     assert margin_based_score(0, 0, CFG) == 0.0

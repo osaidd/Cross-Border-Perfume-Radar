@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from perfume_radar.analysis import CostParams, enrich
+from perfume_radar.analysis import CostParams, enrich, latest_per_url
 from perfume_radar.config import AppConfig, load_config
 from perfume_radar.etl.normalize import load_synonyms, match_title
 from perfume_radar.predictor import predict_for_retail, train_models
@@ -41,7 +41,7 @@ def match_listings(
 
 def aggregate_listings(matched: pd.DataFrame) -> pd.DataFrame:
     """Per-SKU aggregates from the latest observation of each unique listing URL."""
-    latest = matched.sort_values("seen_at").groupby("url", as_index=False).tail(1)
+    latest = latest_per_url(matched)
     latest = latest.assign(platform=latest["platform"].str.lower())
     agg = (
         latest.groupby("product_id")

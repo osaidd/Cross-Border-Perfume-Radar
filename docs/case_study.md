@@ -11,7 +11,7 @@ Bought at AED 80.42 (wholesale, confidence 1.0), it
 lands in Singapore at S$37.32 against a median street price of
 S$79.89. True margin after all costs: 45.3%, with
 431 units sold across tracked listings in 30 days — viability
-97.1/100. Decision: **IMPORT**, suggested initial order ~43
+97.1/100. Decision: **IMPORT**, suggested initial order ~44
 units/month.
 
 ## 2. The hidden-cost trap: Nabeel Nasaem 100ml

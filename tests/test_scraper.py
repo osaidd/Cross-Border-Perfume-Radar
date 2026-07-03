@@ -32,27 +32,6 @@ def test_build_search_url_page_param():
     assert "page=2" in url
 
 
-def test_noon_product_id_deterministic():
-    from scrapers.noon_scraper import NoonProduct
-
-    p = NoonProduct(
-        title="Lattafa Khamrah EDP 100ml",
-        price_aed=28.0,
-        brand="Lattafa",
-        url="https://noon.com/test",
-    )
-    assert len(p.product_id) == 12
-    assert (
-        p.product_id
-        == NoonProduct(
-            title="Lattafa Khamrah EDP 100ml",
-            price_aed=99.0,
-            brand="Lattafa",
-            url="https://noon.com/other",
-        ).product_id
-    )  # ID is title-based only
-
-
 def test_save_to_csv_writes_expected_columns():
     from scrapers.noon_scraper import NoonProduct, save_to_csv
 
@@ -72,9 +51,12 @@ def test_save_to_csv_writes_expected_columns():
             reader = csv.DictReader(f)
             rows = list(reader)
         assert len(rows) == 1
+        assert rows[0]["title"] == "Lattafa Khamrah EDP 100ml"
         assert rows[0]["brand"] == "Lattafa"
         assert float(rows[0]["price_aed"]) == 28.0
         assert rows[0]["source"] == "noon.com"
+        assert rows[0]["url"] == "https://noon.com/khamrah"
+        assert "product_id" not in rows[0]
     finally:
         os.unlink(path)
 
@@ -91,7 +73,6 @@ if __name__ == "__main__":
     test_module_imports()
     test_build_search_url_encodes_spaces()
     test_build_search_url_page_param()
-    test_noon_product_id_deterministic()
     test_save_to_csv_writes_expected_columns()
     test_parse_search_page_empty_html()
     print("All scraper tests passed.")

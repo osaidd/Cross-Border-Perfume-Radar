@@ -51,6 +51,15 @@ OUTPUT_COLUMNS = [
 ]
 
 
+def latest_per_url(listings: pd.DataFrame) -> pd.DataFrame:
+    """Collapse repeated observations of the same listing URL to its most recent row.
+
+    Shared by the pipeline (build_dataset.aggregate_listings) and app.py's Deep
+    Dive listings view, so both always agree on what "latest" means.
+    """
+    return listings.sort_values("seen_at").groupby("url", as_index=False).tail(1)
+
+
 @dataclass(frozen=True)
 class CostParams:
     fx_aed_sgd: float

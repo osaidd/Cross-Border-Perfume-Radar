@@ -23,7 +23,6 @@ Rate-limiting and compliance notes:
 """
 
 import csv
-import hashlib
 import time
 from dataclasses import dataclass
 
@@ -57,17 +56,18 @@ DEFAULT_HEADERS = {
 
 @dataclass
 class NoonProduct:
-    """A single product listing scraped from Noon.com."""
+    """A single product listing scraped from Noon.com.
+
+    No product ID is assigned here. The repo uses a single canonical ID
+    scheme (perfume_radar.etl.ids.make_product_id, hashed from brand/line/
+    name/size/concentration) applied downstream during matching — raw
+    scraped titles are not a reliable enough key on their own.
+    """
 
     title: str
     price_aed: float
     brand: str
     url: str
-
-    @property
-    def product_id(self) -> str:
-        """Deterministic 12-char SHA-1 ID derived from the product title."""
-        return hashlib.sha1(self.title.lower().encode()).hexdigest()[:12]
 
 
 # ── URL helpers ───────────────────────────────────────────────────────────────
@@ -196,14 +196,13 @@ def scrape_search_results(query: str, max_pages: int = 3) -> list[NoonProduct]:
 
 def save_to_csv(products: list[NoonProduct], output_path: str) -> None:
     """Save scraped products to CSV in the format expected by the cost engine."""
-    fieldnames = ["product_id", "title", "brand", "price_aed", "source", "url"]
+    fieldnames = ["title", "brand", "price_aed", "source", "url"]
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for p in products:
             writer.writerow(
                 {
-                    "product_id": p.product_id,
                     "title": p.title,
                     "brand": p.brand,
                     "price_aed": p.price_aed,

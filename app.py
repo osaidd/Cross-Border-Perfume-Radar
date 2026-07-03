@@ -13,7 +13,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from perfume_radar.analysis import INPUT_COLUMNS, CostParams, enrich
+from perfume_radar.analysis import INPUT_COLUMNS, CostParams, enrich, latest_per_url
 from perfume_radar.config import load_config
 from perfume_radar.cost_engine import calculate_landed_cost, calculate_profitability
 from perfume_radar.scoring import margin_based_score, recommend, reorder_suggestion
@@ -68,6 +68,12 @@ def load_inputs() -> pd.DataFrame:
 
 @st.cache_data
 def load_listings() -> pd.DataFrame:
+    if not os.path.exists(MATCHED_PATH):
+        st.error(
+            "Listings file missing — run `make pipeline` (or "
+            "`python -m perfume_radar.etl.build_dataset`) first."
+        )
+        st.stop()
     return pd.read_csv(MATCHED_PATH)
 
 
@@ -141,7 +147,8 @@ def platform_comparison(luc_sgd, sg_price, fees):
 
 
 def estimate_uae_price(brand: str, volume_ml: int, snap: pd.DataFrame):
-    """Median Dubai price of observed (confidence >= 0.6) same-brand SKUs near this size."""
+    """Median observed Dubai buy price (wholesale + retail proxy sources, confidence
+    >= 0.6) of same-brand SKUs near this size."""
     observed = snap[(snap["brand"].str.lower() == brand.lower()) & (snap["confidence"] >= 0.6)]
     if observed.empty:
         return None, "low", 0
@@ -188,7 +195,7 @@ if page == "Profitability Radar":
         )
 
     import_count = int((table["recommendation"] == "IMPORT").sum())
-    best = table.iloc[table["net_margin_pct"].idxmax()]
+    best = table.loc[table["net_margin_pct"].idxmax()]
     avg_gap = (table["naive_margin_pct"] - table["net_margin_pct"]).mean()
     c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("SKUs Analysed", len(table))
@@ -364,8 +371,8 @@ elif page == "Analyse a Product":
 
     with st.expander("Don't know the Dubai price? Estimate it →"):
         st.caption(
-            "Estimates a *Dubai retail proxy* from observed same-brand prices "
-            "(wholesale + proxy sources only)."
+            "Estimates an *observed Dubai buy price (wholesale + retail proxy sources)* "
+            "from same-brand prices."
         )
         est_brand = st.selectbox("Brand", sorted(table["brand"].unique()))
         est_vol = st.number_input("Volume (ml)", 10, 500, 100, 25)
@@ -543,7 +550,7 @@ elif page == "Product Deep Dive":
     st.subheader("Matched Listings")
     listings = load_listings()
     mine = listings[listings["product_id"] == selected_pid]
-    latest = mine.sort_values("seen_at").groupby("url", as_index=False).tail(1)
+    latest = latest_per_url(mine)
     if latest.empty:
         st.caption("No listings matched to this SKU.")
     else:

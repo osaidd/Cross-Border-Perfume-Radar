@@ -10,7 +10,7 @@ Usage (requires chromedriver on PATH):
     python scrapers/shopee_scraper.py --query "lattafa khamrah" --pages 2
 
 Output is saved to data/raw/shopee_<query>_<date>.csv matching the schema
-used in data/samples/sg_listings_sample.csv.
+used in data/samples/sg_listings.csv.
 """
 
 import argparse
@@ -213,7 +213,7 @@ def scrape_query(
 
 
 def save_to_csv(products: list[ShopeeProduct], output_path: str) -> None:
-    """Write scraped products to CSV matching sg_listings_sample.csv schema."""
+    """Write scraped products to CSV matching sg_listings.csv schema."""
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     fieldnames = ["product_title", "price_sgd", "sold_30d", "rating", "url", "platform", "seen_at"]
     with open(output_path, "w", newline="", encoding="utf-8") as f:

@@ -57,11 +57,3 @@ def calculate_profitability(
         "net_profit_sgd": round(net_profit_sgd, 2),
         "net_margin_pct": round(net_margin_pct, 1),
     }
-
-
-def calculate_viability_score(net_margin_pct: float, sg_selling_price_sgd: float) -> float:
-    """Legacy 0-100 score (margin + price only). Replaced by perfume_radar.scoring
-    in the snapshot pipeline; kept until app.py moves off the flat CSV (Task 6)."""
-    margin_score = min(max(net_margin_pct / 35.0, 0), 1.0) * 70
-    price_score = min(max(sg_selling_price_sgd / 100.0, 0), 1.0) * 30
-    return round(margin_score + price_score, 1)

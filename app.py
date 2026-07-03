@@ -207,7 +207,7 @@ if page == "Profitability Radar":
     if top5.empty:
         st.caption("No IMPORT candidates under current parameters.")
     else:
-        for col, (_, r) in zip(st.columns(len(top5)), top5.iterrows(), strict=False):
+        for col, (_, r) in zip(st.columns(len(top5)), top5.iterrows(), strict=True):
             with col:
                 st.markdown(
                     f"**{r['Display']}**  \n*{r['brand']}*  \n"
@@ -299,7 +299,7 @@ elif page == "Analyse a Product":
         if hits.empty:
             st.caption("No matches found.")
         else:
-            for col, (_, h) in zip(st.columns(len(hits)), hits.iterrows(), strict=False):
+            for col, (_, h) in zip(st.columns(len(hits)), hits.iterrows(), strict=True):
                 if col.button(h["Display"], key=f"prefill_{h['product_id']}"):
                     st.session_state.calc_product_name = h["Display"]
                     st.session_state.calc_brand = h["brand"]

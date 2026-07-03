@@ -1,7 +1,9 @@
+PYTHON ?= python3
+
 .PHONY: install lint format test data pipeline run
 
 install:
-	pip install -e ".[dev,scrapers]"
+	$(PYTHON) -m pip install -e ".[dev,scrapers]"
 
 lint:
 	ruff check .
@@ -12,13 +14,13 @@ format:
 	ruff check --fix .
 
 test:
-	pytest -q
+	$(PYTHON) -m pytest -q
 
 data:
-	python scripts/author_sample_data.py
+	$(PYTHON) scripts/author_sample_data.py
 
 pipeline:
-	python -m perfume_radar.etl.build_dataset
+	$(PYTHON) -m perfume_radar.etl.build_dataset
 
 run:
-	streamlit run app.py
+	$(PYTHON) -m streamlit run app.py

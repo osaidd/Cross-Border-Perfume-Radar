@@ -1,101 +1,39 @@
-# Data Workflow: Raw Title to Product ID Mapping
+# Data Workflow: from raw listings to the analysis snapshot
 
-## Overview
+## Pipeline
 
-This document explains how raw marketplace titles (like "Lattafa Khamrah Eau de Parfum 100ml Original Authentic for Men") get processed into structured product IDs that can be used consistently across different data sources.
+`make pipeline` (= `python -m perfume_radar.etl.build_dataset`) runs five stages:
 
-## The Workflow
+1. **Load** `data/samples/{products,sg_listings,dubai_prices,synonyms}.csv`.
+2. **Match** each listing title to a catalogue SKU:
+   `normalize_title()` lowercases, extracts `NNml` sizes, canonicalizes
+   concentrations (eau de parfum → edp) and strips decorations
+   ("Original", "Authentic", "[SG Stock]", ...); `apply_synonyms()` fixes brand
+   variants ("latafa" → "lattafa"); `match_title()` scores candidates with
+   rapidfuzz `token_set_ratio` and accepts at the configured threshold
+   (`matching.fuzzy_threshold`, default 85). Rejected titles land in
+   `data/processed/unmatched_listings.csv` — nothing is dropped silently.
+3. **Aggregate** per SKU over the *latest observation of each unique listing URL*:
+   P25/P50 price bands, market heat (sum of `sold_30d`), platform set, listing
+   count, `heat_percentile` (rank among tracked SKUs).
+4. **Resolve** each SKU's Dubai price by the PRD hierarchy:
+   wholesale sheet (confidence 1.0) → retail proxy (0.6) → predicted (0.4,
+   via `perfume_radar/predictor.py` trained on the SKUs that have both
+   wholesale and proxy prices). SKUs with no resolvable price are excluded and
+   reported on stdout.
+5. **Compute** outputs with `perfume_radar/analysis.enrich` under the default
+   config: LUC components, best platform, net/naive margins, viability,
+   recommendation → `data/processed/analysis_snapshot.csv`.
 
-### Step 1: Raw Marketplace Title
-```
-"Lattafa Khamrah Eau de Parfum 100ml Original Authentic for Men"
-```
+## Product identity
 
-### Step 2: Title Normalization
-The `normalize_title()` function processes the raw title:
+One scheme everywhere: `make_product_id(brand, line, name, size_ml, concentration)`
+= first 12 hex chars of SHA-1 over the lowercased `|`-joined key. Same SKU ⇒
+same ID, regardless of which marketplace title it was seen under.
 
-1. **Convert to lowercase**: `lattafa khamrah eau de parfum 100ml original authentic for men`
-2. **Extract size**: `100ml` → `size_ml = 100`
-3. **Map concentrations**: `eau de parfum` → `edp`
-4. **Remove stopwords**: `original`, `authentic`, `for men` are removed
-5. **Clean punctuation**: Remove special characters
-6. **Result**: `"lattafa khamrah edp 100ml"`
+## Why the app recomputes
 
-### Step 3: Product ID Generation
-The `make_product_id()` function creates a deterministic ID:
-
-```python
-key = "lattafa|khamrah||100|edp"  # brand|line|name|size|concentration
-product_id = sha1(key).hexdigest()[:12]  # "551be9fcd013"
-```
-
-### Step 4: Database Matching
-The normalized title can be matched to existing products using fuzzy matching with a confidence threshold of 85%.
-
-## Key Features
-
-### Deterministic IDs
-- Same product always gets same ID regardless of title variations
-- Based on core product attributes: brand, line, name, size, concentration
-- 12-character SHA1 hash for uniqueness
-
-### Title Normalization
-- Handles multiple concentration formats (EDP, EDT, Parfum)
-- Extracts size information reliably
-- Removes marketplace-specific decorations
-- Case-insensitive matching
-
-### Fuzzy Matching
-- Uses rapidfuzz library for intelligent string matching
-- Handles typos, word order changes, and variations
-- 85% confidence threshold for reliable matches
-
-## Example Variations
-
-All these titles map to the same product ID (`551be9fcd013`):
-
-- "Lattafa Khamrah EDP 100ml Original"
-- "Lattafa Khamrah Eau de Parfum 100ml Authentic"
-- "Lattafa Khamrah 100ml for Men"
-- "Lattafa Khamrah EDP 100ml"
-
-## Data Tables
-
-### products.csv
-| Column | Type | Example |
-|--------|------|---------|
-| product_id | str(12) | "551be9fcd013" |
-| brand | str | "Lattafa" |
-| line | str | "Khamrah" |
-| name | str | "" |
-| size_ml | int | 100 |
-| concentration | str | "EDP" |
-| notes | str | "Popular gourmand fragrance" |
-
-### sg_listings_*.csv
-| Column | Type | Example |
-|--------|------|---------|
-| product_title | str | "Lattafa Khamrah EDP 100ml Original" |
-| price_sgd | float | 45.90 |
-| sold_30d | int | 12 |
-| rating | float | 4.5 |
-| url | str | "https://shopee.sg/..." |
-| platform | str | "Shopee" |
-| seen_at | date | "2024-01-15" |
-
-## Usage
-
-```python
-from etl.id_utils import make_product_id
-from etl.utils_normalize import normalize_title, fuzzy_match_to_product
-
-# Generate product ID
-product_id = make_product_id("Lattafa", "Khamrah", "", 100, "EDP")
-
-# Normalize title
-norm = normalize_title("Lattafa Khamrah Eau de Parfum 100ml Original")
-# Returns: {"norm_title": "lattafa khamrah edp 100ml", "size_ml": 100}
-
-# Match to existing products
-matched_id = fuzzy_match_to_product(title, products_df)
-```
+The snapshot stores *resolved inputs* (prices, weights, bands, heat, confidence)
+plus default-config outputs. `app.py` re-runs `enrich()` on the inputs with the
+current sidebar parameters, so FX/GST/shipping/fee changes recalculate every
+number live — while the committed outputs keep exports reproducible.

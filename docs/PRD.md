@@ -13,7 +13,7 @@ I need a repeatable, data-driven way to find perfume SKUs with the best UAE→SG
 - Cost params: shipping by weight, FX AED→SGD, GST policy, packaging weight.
 
 ## Outputs (what the app returns)
-- Per-SKU: Landed Unit Cost (LUC), SG price bands (P25/P50), Profit Gap, Market Heat, Confidence, and a **Viability Score** (0–100) with "Import / Wait / Skip".
+- Per-SKU: Landed Unit Cost (LUC), SG price bands (P25/P50), Profit Gap, Market Heat, Confidence, and a **Viability Score** (0–100) with "Import / Watch / Skip".
 - Top 10 CSV export. SKU Deep Dive page. Simple reorder suggestion.
 
 ## Scope (v1)
@@ -73,3 +73,14 @@ W1 foundations → W2 SG module → W3 Dubai & costs → W4 scoring + UI → W5 
 | source | str | wholesale / proxy / predicted |
 | confidence | float | 1.0 / 0.6 / 0.4 |
 | seen_at | date | YYYY-MM-DD |
+
+## Implementation Notes (2026-07)
+
+| Requirement | Where it lives |
+|---|---|
+| LUC + cost breakdown | `perfume_radar/cost_engine.py` |
+| Price bands, market heat, confidence | `perfume_radar/etl/build_dataset.py` |
+| Viability + Import/Watch/Skip + low-confidence gate | `perfume_radar/scoring.py` |
+| Dubai price hierarchy (wholesale/proxy/predicted) | `build_dataset.resolve_dubai_prices` |
+| Ranked table, Top-10 export, deep dive, reorder suggestion | `app.py` |
+| Acceptance tests | `tests/` — search `test_acceptance_` |

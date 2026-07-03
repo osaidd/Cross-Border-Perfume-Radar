@@ -1,110 +1,91 @@
 # Cross-Border Perfume Radar
 
-A profitability intelligence tool for micro-importers. Analyses marketplace pricing across UAE and Singapore, calculates true landed costs, and identifies profitable cross-border import opportunities.
+Profitability intelligence for UAE → Singapore perfume micro-imports. Computes the
+true landed cost of every SKU (FX + shipping + duty + GST + platform commission),
+compares it against Singapore marketplace prices, and ranks import opportunities
+by a demand-aware viability score.
 
-## The Problem
+## What it does
 
-Small cross-border sellers have no visibility into whether an import will actually be profitable. To figure out if it's worth importing a product from the UAE to Singapore, you'd need to:
-
-- Check the source price on Noon.com or Amazon.ae (no public API)
-- Find the competitor selling price on Shopee or Lazada Singapore
-- Calculate shipping costs based on weight
-- Look up customs duty for the product's HS code
-- Apply Singapore GST (9%) to the correct base
-- Factor in marketplace commission fees (different per platform)
-- Convert currencies and account for FX fluctuation
-
-This tool does that entire analysis automatically.
-
-## What It Does
-
-**Input:** Fragrance product data from UAE and Singapore marketplaces
-**Output:** A ranked list of products by projected net margin after ALL costs
-
-The system:
-1. Calculates full **landed cost** per unit: product price + FX conversion + shipping + customs duty + GST (9%) + platform commission
-2. Compares landed cost against Singapore marketplace selling prices
-3. Outputs **margin analysis**: net margin %, viability score (0-100), and a clear recommendation (Import / Watch / Skip)
-4. Visualises **cost breakdowns** per product so you can see exactly where margin is gained or lost
+- **Landed Unit Cost (LUC)** per SKU: Dubai price × FX + weight-based shipping
+  + customs duty (0% for HS 3303) + 9% GST on CIF+duty
+- **Price bands** (P25/P50) and **market heat** (30-day sold counts) aggregated
+  from Singapore listings across Shopee, Lazada and Carousell
+- **Dubai price confidence**: wholesale sheet (1.0) → retail proxy (0.6) →
+  model-predicted (0.4), with low-confidence SKUs gated out of IMPORT unless
+  demand is top-quartile
+- **Recommendation** per SKU — IMPORT (≥20% true margin), WATCH (≥10%), SKIP —
+  plus naive-vs-true margin so you can see exactly what the hidden costs eat
 
 ## Dashboard
 
-### Top Opportunities
-Highest-margin products surfaced automatically with true margin after all costs.
+| Page | What it shows |
+|---|---|
+| Profitability Radar | Ranked SKU table, filters, top opportunities, CSV + Top-10 export |
+| Analyse a Product | Manual calculator with cost waterfall and price estimator |
+| Product Deep Dive | Per-SKU cost breakdown, matched listings, optimal route, reorder suggestion |
+| Settings | Live FX/GST/shipping/fee overrides (defaults from `config/cost_rules.yml`) |
 
-<img width="536" alt="Top Opportunities" src="https://github.com/user-attachments/assets/3e206667-7482-4df2-a863-6a610a674062" />
+![Profitability Radar](docs/images/radar.png)
+![Product Deep Dive](docs/images/deepdive.png)
 
-### Filterable Table with CSV Export
-Full ranked table with marketplace, source, and recommendation filters.
-
-<img width="522" alt="Filterable Table" src="https://github.com/user-attachments/assets/97b8ceb5-8a90-4000-b5cb-f7552a3f071f" />
-
-### Product Deep Dive and Optimal Sourcing Route
-Per-product cost waterfall and cross-platform profit comparison.
-
-<img width="598" alt="Product Deep Dive" src="https://github.com/user-attachments/assets/c6b6c51a-0ab1-4198-bb94-3d7199da4634" />
-
-<img width="597" alt="Optimal Sourcing Route" src="https://github.com/user-attachments/assets/26b1c37d-d0af-4d5d-985c-2c5c4d0c5513" />
-
-### Tweakable FX and Commission Rates
-Adjust FX rate, GST, shipping, and per-platform fees live from the sidebar.
-
-<img width="585" alt="Settings" src="https://github.com/user-attachments/assets/0766495f-5515-458d-b754-2fab5cf1db62" />
-
----
-
-## How It Works
+## How it works
 
 ```
-UAE Marketplaces              Singapore Marketplaces
-(Noon.com, Amazon.ae)         (Shopee, Lazada, Carousell)
-       │                              │
-       ▼                              ▼
-  Source Pricing              Destination Pricing
-       │                              │
-       └────────────┬─────────────────┘
-                    ▼
-            Cost Engine
-   (FX + Shipping + Duty + GST
-    + Platform Commission)
-                    │
-                    ▼
-         Margin Calculator
-    (Net profit, %, viability score)
-                    │
-                    ▼
-       Streamlit Dashboard
-   (Ranked profitability view +
-    per-product cost breakdown)
+data/samples/                    perfume_radar/etl/build_dataset.py       app.py
+products.csv      ─┐            1. fuzzy-match titles → product_id      Streamlit
+sg_listings.csv   ─┼──────────▶ 2. aggregate bands + heat        ─────▶ dashboard
+dubai_prices.csv  ─┤            3. resolve Dubai price (w/p/pred)       (recomputes
+synonyms.csv      ─┘            4. cost + score (analysis.enrich)        live from
+                                → data/processed/analysis_snapshot.csv   the snapshot)
 ```
 
-## Key Parameters
-
-| Cost Component | Value | Notes |
-|---|---|---|
-| FX Rate | ~0.37 SGD/AED | Fluctuates daily |
-| Shipping | ~$16 SGD/kg | Small parcel estimate |
-| Customs Duty | 0% | HS 3303 (fragrances) duty-free in SG |
-| GST | 9% | Applied to CIF value |
-| Shopee Commission | ~8% | Includes payment processing |
-| Lazada Commission | ~6% | Varies by category |
-| Carousell Commission | 0% | Peer-to-peer |
-
-## Quick Start
+## Quick start
 
 ```bash
 git clone https://github.com/osaidd/Cross-Border-Perfume-Radar.git
 cd Cross-Border-Perfume-Radar
-pip install -r requirements.txt
-streamlit run app.py
+make install          # pip install -e ".[dev,scrapers]"
+make run              # streamlit run app.py (uses the committed snapshot)
 ```
 
-## Built With
+Regenerate everything from source: `make data && make pipeline`. Run checks:
+`make lint && make test`.
 
-Python · Pandas · Streamlit · Plotly · Scikit-learn
+## Data
+
+Everything in this repo is reproducible from the repo itself. `data/samples/`
+holds a synthetic-but-realistic demo dataset (49 SKUs across 8 fragrance brands,
+four weekly listing rounds ending 2026-06-29) generated deterministically by
+`scripts/author_sample_data.py` — prices reflect real market levels, but no
+scraped records are shipped. `data/processed/` holds the committed pipeline
+output; `tests/test_pipeline.py` fails if it drifts from the inputs.
+
+The scrapers in `scrapers/` are documented **reference implementations** of the
+collection approach (rate limits, robots.txt compliance, selector strategy);
+they are not wired into the pipeline.
+
+## Key parameters (`config/cost_rules.yml`, overridable live in Settings)
+
+| Parameter | Default | Notes |
+|---|---|---|
+| FX rate | 0.37 SGD/AED | override via `config/.env` |
+| Shipping | S$16/kg | linear small-parcel rate |
+| Customs duty | 0% | HS 3303 fragrances duty-free in SG |
+| GST | 9% | applied to CIF + duty |
+| Shopee / Lazada / Carousell fee | 8% / 6% / 0% | commission incl. processing |
+
+## Engineering
+
+Python ≥3.11 · pandas · scikit-learn · rapidfuzz · Streamlit · Plotly.
+`pytest` suite includes the three PRD acceptance tests by name and
+`streamlit.testing.AppTest` smoke tests for every page; `ruff` for lint/format;
+GitHub Actions CI on 3.11/3.12. See `docs/PRD.md` (requirements),
+`docs/data_workflow.md` (pipeline internals) and `docs/case_study.md`
+(three SKU walkthroughs).
 
 ## Background
 
-Built for [Imperial Oud](https://github.com/osaidd), a cross-border e-commerce venture between Singapore and the UAE. This tool was used to make real sourcing and pricing decisions — it identified 20%+ margin opportunities across ~250 listings/week that would have been missed with manual analysis.
-
-The long-term vision: productise this into a decision tool for any micro-importer doing cross-border e-commerce in Southeast Asia.
+Built for Imperial Oud, a small cross-border venture between Singapore and the
+UAE, to replace spreadsheet-and-guesswork sourcing decisions with a repeatable
+landed-cost analysis. This repo is the productised demo of that workflow.

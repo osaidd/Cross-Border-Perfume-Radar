@@ -37,7 +37,7 @@ class CostParams:
     platform_fees: dict[str, float]
 
     @classmethod
-    def from_config(cls, cfg: AppConfig) -> "CostParams":
+    def from_config(cls, cfg: AppConfig) -> CostParams:
         return cls(cfg.fx_aed_sgd, cfg.shipping_per_kg_sgd, cfg.customs_duty_rate,
                    cfg.gst_rate, dict(cfg.platform_fees))
 

@@ -39,7 +39,10 @@ def normalize_title(title: str) -> dict:
 def load_synonyms(path: str | Path) -> dict[str, str]:
     """Read synonyms.csv into {lowercase synonym: canonical brand}."""
     df = pd.read_csv(path)
-    return {str(s).lower(): str(c) for s, c in zip(df["brand_synonym"], df["canonical"])}
+    return {
+        str(s).lower(): str(c)
+        for s, c in zip(df["brand_synonym"], df["canonical"], strict=True)
+    }
 
 
 def apply_synonyms(text: str, synonyms: dict[str, str]) -> str:
@@ -64,8 +67,10 @@ def match_title(
         norm = apply_synonyms(norm, synonyms)
     best_id, best_score, best_tiebreak = None, 0, -1.0
     for _, row in products.iterrows():
-        target = f"{row['brand']} {row['line']} {row['name']} {row['size_ml']}ml {row['concentration']}"
-        target = target.lower()
+        target = (
+            f"{row['brand']} {row['line']} {row['name']} "
+            f"{row['size_ml']}ml {row['concentration']}"
+        ).lower()
         score = fuzz.token_set_ratio(norm, target)
         # token_set_ratio scores 100 for both a base line and its flankers
         # whenever one title's tokens are a subset of the other's (e.g. "Khamrah"

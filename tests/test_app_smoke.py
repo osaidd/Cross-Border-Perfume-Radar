@@ -1,4 +1,5 @@
 """AppTest smoke tests: every page renders; sliders recompute LUC."""
+
 import pytest
 from streamlit.testing.v1 import AppTest
 
@@ -29,13 +30,13 @@ def test_radar_has_table_and_metrics():
 def test_deep_dive_has_metrics_and_listings():
     at = _run("Product Deep Dive")
     assert len(at.metric) >= 4
-    assert len(at.dataframe) >= 1   # matched-listings table
+    assert len(at.dataframe) >= 1  # matched-listings table
 
 
 def test_slider_change_recalculates_luc():
     """AppTest variant of PRD acceptance test 1."""
     at = _run("Product Deep Dive")
-    before = at.metric[0].value      # "Landed Cost" metric
+    before = at.metric[0].value  # "Landed Cost" metric
     at.session_state["fx_rate"] = 0.55
     at.run()
     assert not at.exception

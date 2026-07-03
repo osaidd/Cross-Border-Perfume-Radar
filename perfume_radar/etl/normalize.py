@@ -1,4 +1,5 @@
 """Marketplace-title normalization and synonym-aware fuzzy matching."""
+
 from __future__ import annotations
 
 import re
@@ -15,8 +16,13 @@ CONC_MAP = {
 }
 
 STOPWORDS = {
-    "original", "authentic", "for men", "for women", "unisex",
-    "sg stock", "ready stock",
+    "original",
+    "authentic",
+    "for men",
+    "for women",
+    "unisex",
+    "sg stock",
+    "ready stock",
 }
 
 
@@ -40,8 +46,7 @@ def load_synonyms(path: str | Path) -> dict[str, str]:
     """Read synonyms.csv into {lowercase synonym: canonical brand}."""
     df = pd.read_csv(path)
     return {
-        str(s).lower(): str(c)
-        for s, c in zip(df["brand_synonym"], df["canonical"], strict=True)
+        str(s).lower(): str(c) for s, c in zip(df["brand_synonym"], df["canonical"], strict=True)
     }
 
 
@@ -68,8 +73,7 @@ def match_title(
     best_id, best_score, best_tiebreak = None, 0, -1.0
     for _, row in products.iterrows():
         target = (
-            f"{row['brand']} {row['line']} {row['name']} "
-            f"{row['size_ml']}ml {row['concentration']}"
+            f"{row['brand']} {row['line']} {row['name']} {row['size_ml']}ml {row['concentration']}"
         ).lower()
         score = fuzz.token_set_ratio(norm, target)
         # token_set_ratio scores 100 for both a base line and its flankers

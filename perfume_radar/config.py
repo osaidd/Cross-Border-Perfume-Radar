@@ -1,4 +1,5 @@
 """Single config loader: config/cost_rules.yml with config/.env overrides."""
+
 from __future__ import annotations
 
 import os

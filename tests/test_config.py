@@ -1,4 +1,5 @@
 """Tests for perfume_radar.config."""
+
 import pytest
 
 from perfume_radar.config import load_config

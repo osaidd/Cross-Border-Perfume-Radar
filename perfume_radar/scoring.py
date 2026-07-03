@@ -7,6 +7,7 @@ Low-confidence gate (PRD risk mitigation): a predicted Dubai price
 (confidence <= 0.4) cannot yield IMPORT unless demand is above the
 configured percentile floor.
 """
+
 from __future__ import annotations
 
 from math import ceil

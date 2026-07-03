@@ -1,4 +1,5 @@
 """Tests for perfume_radar.scoring (viability v2 + confidence gate)."""
+
 from perfume_radar.config import load_config
 from perfume_radar.scoring import (
     margin_based_score,
@@ -53,7 +54,7 @@ def test_margin_based_score_rescaled_to_100():
 
 
 def test_reorder_suggestion():
-    assert reorder_suggestion(200, "IMPORT") == 20   # ceil(0.10 * heat)
-    assert reorder_suggestion(3, "IMPORT") == 1      # floor of 1 unit
+    assert reorder_suggestion(200, "IMPORT") == 20  # ceil(0.10 * heat)
+    assert reorder_suggestion(3, "IMPORT") == 1  # floor of 1 unit
     assert reorder_suggestion(200, "WATCH") is None
     assert reorder_suggestion(200, "SKIP") is None

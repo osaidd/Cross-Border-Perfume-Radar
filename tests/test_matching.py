@@ -1,14 +1,29 @@
 """Tests for synonym-aware title matching."""
+
 import pandas as pd
 
 from perfume_radar.etl.normalize import apply_synonyms, match_title, normalize_title
 
-PRODUCTS = pd.DataFrame([
-    {"product_id": "aaaaaaaaaaaa", "brand": "Lattafa", "line": "Khamrah", "name": "Khamrah",
-     "size_ml": 100, "concentration": "EDP"},
-    {"product_id": "bbbbbbbbbbbb", "brand": "Rasasi", "line": "Hawas", "name": "Hawas",
-     "size_ml": 100, "concentration": "EDP"},
-])
+PRODUCTS = pd.DataFrame(
+    [
+        {
+            "product_id": "aaaaaaaaaaaa",
+            "brand": "Lattafa",
+            "line": "Khamrah",
+            "name": "Khamrah",
+            "size_ml": 100,
+            "concentration": "EDP",
+        },
+        {
+            "product_id": "bbbbbbbbbbbb",
+            "brand": "Rasasi",
+            "line": "Hawas",
+            "name": "Hawas",
+            "size_ml": 100,
+            "concentration": "EDP",
+        },
+    ]
+)
 SYN = {"latafa": "Lattafa", "rassasi": "Rasasi"}
 
 

@@ -1,4 +1,5 @@
 """Integration tests: full pipeline over the shipped sample inputs."""
+
 from pathlib import Path
 
 import pandas as pd
@@ -19,7 +20,7 @@ def result(tmp_path_factory):
 def test_snapshot_covers_catalogue(result):
     products = pd.read_csv("data/samples/products.csv")
     snap = result["snapshot"]
-    assert len(snap) == len(products)          # sample data has no excluded SKUs
+    assert len(snap) == len(products)  # sample data has no excluded SKUs
     assert result["excluded"] == []
 
 
@@ -44,8 +45,11 @@ def test_price_bands_and_heat(result):
 
 def test_unmatched_report(result):
     titles = set(result["unmatched"]["product_title"])
-    assert {"Dior Sauvage EDT 100ml", "Chanel Bleu de Chanel EDP 100ml",
-            "Mystery Oud Tester 10ml"} == titles
+    assert {
+        "Dior Sauvage EDT 100ml",
+        "Chanel Bleu de Chanel EDP 100ml",
+        "Mystery Oud Tester 10ml",
+    } == titles
 
 
 def test_recommendations_and_scores_present(result):

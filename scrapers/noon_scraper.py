@@ -22,9 +22,9 @@ Rate-limiting and compliance notes:
   - Cache results locally — do not hit the same URL twice per session.
 """
 
-import time
 import csv
 import hashlib
+import time
 from dataclasses import dataclass
 
 import requests
@@ -54,6 +54,7 @@ DEFAULT_HEADERS = {
 
 # ── Data model ────────────────────────────────────────────────────────────────
 
+
 @dataclass
 class NoonProduct:
     """A single product listing scraped from Noon.com."""
@@ -71,6 +72,7 @@ class NoonProduct:
 
 # ── URL helpers ───────────────────────────────────────────────────────────────
 
+
 def build_search_url(query: str, page: int = 1) -> str:
     """Build a Noon.com search URL for a fragrance query."""
     base = NOON_SEARCH_URL.format(query=query.replace(" ", "+"))
@@ -78,6 +80,7 @@ def build_search_url(query: str, page: int = 1) -> str:
 
 
 # ── Parsing ───────────────────────────────────────────────────────────────────
+
 
 def parse_product_card(card) -> "NoonProduct | None":
     """
@@ -107,9 +110,7 @@ def parse_product_card(card) -> "NoonProduct | None":
 
     try:
         price_text = price_el.get_text(strip=True)
-        price_aed = float(
-            price_text.replace("AED", "").replace(",", "").strip()
-        )
+        price_aed = float(price_text.replace("AED", "").replace(",", "").strip())
     except ValueError:
         return None
 
@@ -146,6 +147,7 @@ def parse_search_page(html: str) -> list[NoonProduct]:
 
 
 # ── Collection ────────────────────────────────────────────────────────────────
+
 
 def scrape_search_results(query: str, max_pages: int = 3) -> list[NoonProduct]:
     """
@@ -191,6 +193,7 @@ def scrape_search_results(query: str, max_pages: int = 3) -> list[NoonProduct]:
 
 # ── Output ────────────────────────────────────────────────────────────────────
 
+
 def save_to_csv(products: list[NoonProduct], output_path: str) -> None:
     """Save scraped products to CSV in the format expected by the cost engine."""
     fieldnames = ["product_id", "title", "brand", "price_aed", "source", "url"]
@@ -198,14 +201,16 @@ def save_to_csv(products: list[NoonProduct], output_path: str) -> None:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for p in products:
-            writer.writerow({
-                "product_id": p.product_id,
-                "title": p.title,
-                "brand": p.brand,
-                "price_aed": p.price_aed,
-                "source": "noon.com",
-                "url": p.url,
-            })
+            writer.writerow(
+                {
+                    "product_id": p.product_id,
+                    "title": p.title,
+                    "brand": p.brand,
+                    "price_aed": p.price_aed,
+                    "source": "noon.com",
+                    "url": p.url,
+                }
+            )
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
@@ -213,17 +218,15 @@ def save_to_csv(products: list[NoonProduct], output_path: str) -> None:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Scrape Noon.com UAE perfume prices."
+    parser = argparse.ArgumentParser(description="Scrape Noon.com UAE perfume prices.")
+    parser.add_argument(
+        "--queries",
+        nargs="+",
+        default=["lattafa perfume", "rasasi perfume", "afnan perfume", "armaf perfume"],
+        help="Search queries to run",
     )
-    parser.add_argument("--queries", nargs="+",
-                        default=["lattafa perfume", "rasasi perfume",
-                                 "afnan perfume", "armaf perfume"],
-                        help="Search queries to run")
-    parser.add_argument("--pages", type=int, default=2,
-                        help="Max pages per query (default: 2)")
-    parser.add_argument("--out", default="data/raw/noon_prices.csv",
-                        help="Output CSV path")
+    parser.add_argument("--pages", type=int, default=2, help="Max pages per query (default: 2)")
+    parser.add_argument("--out", default="data/raw/noon_prices.csv", help="Output CSV path")
     args = parser.parse_args()
 
     all_products: list[NoonProduct] = []

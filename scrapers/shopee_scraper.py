@@ -17,11 +17,9 @@ import argparse
 import csv
 import os
 import re
-import sys
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -39,6 +37,7 @@ REQUEST_DELAY = 4.0  # polite delay between page fetches
 
 # ── Data model ───────────────────────────────────────────────────────────────
 
+
 @dataclass
 class ShopeeProduct:
     product_title: str
@@ -51,6 +50,7 @@ class ShopeeProduct:
 
 
 # ── Driver setup ─────────────────────────────────────────────────────────────
+
 
 def build_driver() -> webdriver.Chrome:
     """Return a headless Chrome WebDriver instance with anti-detection basics."""
@@ -71,6 +71,7 @@ def build_driver() -> webdriver.Chrome:
 
 # ── URL helpers ──────────────────────────────────────────────────────────────
 
+
 def build_search_url(query: str, page: int = 0) -> str:
     """Build a Shopee search URL. Page is 0-indexed."""
     encoded = query.replace(" ", "+")
@@ -79,6 +80,7 @@ def build_search_url(query: str, page: int = 0) -> str:
 
 # ── Parsing ──────────────────────────────────────────────────────────────────
 
+
 def _extract_sold_count(text: str) -> int:
     """Parse sold count from strings like '1.2k sold' or '408 sold'."""
     text = text.lower().replace(",", "")
@@ -86,12 +88,12 @@ def _extract_sold_count(text: str) -> int:
     if not match:
         return 0
     value = float(match.group(1))
-    if "k" in text[match.start():match.end()]:
+    if "k" in text[match.start() : match.end()]:
         value *= 1000
     return int(value)
 
 
-def _extract_price(text: str) -> Optional[float]:
+def _extract_price(text: str) -> float | None:
     """Parse SGD price from strings like '$29.90' or '29.90'."""
     match = re.search(r"\$?\s*([\d,]+\.?\d*)", text.replace(",", ""))
     if match:
@@ -99,7 +101,7 @@ def _extract_price(text: str) -> Optional[float]:
     return None
 
 
-def parse_product_cards(driver: webdriver.Chrome) -> List[ShopeeProduct]:
+def parse_product_cards(driver: webdriver.Chrome) -> list[ShopeeProduct]:
     """
     Extract product data from the currently loaded Shopee search results page.
 
@@ -148,31 +150,34 @@ def parse_product_cards(driver: webdriver.Chrome) -> List[ShopeeProduct]:
         except Exception:
             url = ""
 
-        products.append(ShopeeProduct(
-            product_title=title,
-            price_sgd=price,
-            sold_30d=sold,
-            rating=rating,
-            url=url,
-        ))
+        products.append(
+            ShopeeProduct(
+                product_title=title,
+                price_sgd=price,
+                sold_30d=sold,
+                rating=rating,
+                url=url,
+            )
+        )
 
     return products
 
 
 # ── Multi-page scrape ────────────────────────────────────────────────────────
 
+
 def scrape_query(
     driver: webdriver.Chrome,
     query: str,
     max_pages: int = 3,
-) -> List[ShopeeProduct]:
+) -> list[ShopeeProduct]:
     """
     Scrape up to max_pages of Shopee search results for a given query.
 
     Scrolls to bottom of each page to trigger lazy-loading, then parses
     product cards before navigating to the next page.
     """
-    all_products: List[ShopeeProduct] = []
+    all_products: list[ShopeeProduct] = []
 
     for page in range(max_pages):
         url = build_search_url(query, page=page)
@@ -206,7 +211,8 @@ def scrape_query(
 
 # ── CSV output ───────────────────────────────────────────────────────────────
 
-def save_to_csv(products: List[ShopeeProduct], output_path: str) -> None:
+
+def save_to_csv(products: list[ShopeeProduct], output_path: str) -> None:
     """Write scraped products to CSV matching sg_listings_sample.csv schema."""
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     fieldnames = ["product_title", "price_sgd", "sold_30d", "rating", "url", "platform", "seen_at"]
@@ -214,19 +220,22 @@ def save_to_csv(products: List[ShopeeProduct], output_path: str) -> None:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for p in products:
-            writer.writerow({
-                "product_title": p.product_title,
-                "price_sgd": p.price_sgd,
-                "sold_30d": p.sold_30d,
-                "rating": p.rating,
-                "url": p.url,
-                "platform": p.platform,
-                "seen_at": p.seen_at,
-            })
+            writer.writerow(
+                {
+                    "product_title": p.product_title,
+                    "price_sgd": p.price_sgd,
+                    "sold_30d": p.sold_30d,
+                    "rating": p.rating,
+                    "url": p.url,
+                    "platform": p.platform,
+                    "seen_at": p.seen_at,
+                }
+            )
     print(f"Saved {len(products)} products to {output_path}")
 
 
 # ── CLI entry point ──────────────────────────────────────────────────────────
+
 
 def main():
     parser = argparse.ArgumentParser(description="Scrape Shopee SG perfume listings")

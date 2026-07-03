@@ -1,16 +1,17 @@
 """Tests for perfume_radar/predictor.py"""
+
 import io
 from contextlib import redirect_stdout
 from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
+
 from perfume_radar.predictor import (
-    prepare_training_pairs,
-    train_models,
-    predict_for_retail,
     evaluate_model,
+    predict_for_retail,
+    train_models,
 )
 
 
@@ -23,18 +24,25 @@ def _make_pairs(n: int = 12) -> pd.DataFrame:
         brand = brands[i % 3]
         retail = rng.uniform(30, 80)
         wholesale = retail * rng.uniform(0.55, 0.75)
-        rows.append({
-            "brand": brand, "line": f"Line{i}", "name": f"Product{i}",
-            "size_ml": 100, "concentration": "EDP",
-            "retail_aed": retail, "wholesale_aed": wholesale,
-            "ratio": wholesale / retail,
-        })
+        rows.append(
+            {
+                "brand": brand,
+                "line": f"Line{i}",
+                "name": f"Product{i}",
+                "size_ml": 100,
+                "concentration": "EDP",
+                "retail_aed": retail,
+                "wholesale_aed": wholesale,
+                "ratio": wholesale / retail,
+            }
+        )
     return pd.DataFrame(rows)
 
 
 def test_train_models_returns_rf_key():
     """train_models must return an 'rf' key with a fitted RandomForest."""
     from sklearn.ensemble import RandomForestRegressor
+
     pairs = _make_pairs()
     models = train_models(pairs)
     assert "rf" in models, "train_models must return 'rf' key"
@@ -47,10 +55,18 @@ def test_blend_uses_three_estimators():
     pairs = _make_pairs(12)
     models = train_models(pairs)
 
-    retail_df = pd.DataFrame([{
-        "brand": "Lattafa", "line": "TestLine", "name": "TestProduct",
-        "size_ml": 100, "concentration": "EDP", "retail_aed": 50.0,
-    }])
+    retail_df = pd.DataFrame(
+        [
+            {
+                "brand": "Lattafa",
+                "line": "TestLine",
+                "name": "TestProduct",
+                "size_ml": 100,
+                "concentration": "EDP",
+                "retail_aed": 50.0,
+            }
+        ]
+    )
     result = predict_for_retail(retail_df, models, known_wholesale_keys=set())
     assert len(result) == 1
     pred = result["predicted_wholesale_aed"].iloc[0]
@@ -80,10 +96,18 @@ def test_interval_derived_from_iqr():
     assert models["interval_basis"] == "iqr"
     lo, hi = models["interval"]
     assert lo < hi
-    retail_df = pd.DataFrame([{
-        "brand": "Lattafa", "line": "TestLine", "name": "TestProduct",
-        "size_ml": 100, "concentration": "EDP", "retail_aed": 50.0,
-    }])
+    retail_df = pd.DataFrame(
+        [
+            {
+                "brand": "Lattafa",
+                "line": "TestLine",
+                "name": "TestProduct",
+                "size_ml": 100,
+                "concentration": "EDP",
+                "retail_aed": 50.0,
+            }
+        ]
+    )
     row = predict_for_retail(retail_df, models, known_wholesale_keys=set()).iloc[0]
     pred = row["predicted_wholesale_aed"]
     assert row["ci_low"] == pytest.approx(pred * (1 + lo), rel=1e-6)

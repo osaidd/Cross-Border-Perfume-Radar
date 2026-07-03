@@ -1,4 +1,5 @@
 """Invariants of the generated sample dataset (regenerate via scripts/author_sample_data.py)."""
+
 from pathlib import Path
 
 import pandas as pd
@@ -14,7 +15,7 @@ UNMATCHED_TITLES = {
 
 def test_products_catalogue():
     df = pd.read_csv(SAMPLES / "products.csv")
-    assert 45 <= len(df) <= 55                      # PRD scope: 8-50 SKUs (we ship ~49)
+    assert 45 <= len(df) <= 55  # PRD scope: 8-50 SKUs (we ship ~49)
     assert df["product_id"].str.len().eq(12).all()
     assert df["product_id"].is_unique
     assert set(df["concentration"].unique()) <= {"EDP", "EDT", "Parfum"}

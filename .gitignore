@@ -19,7 +19,6 @@ config/.env
 
 # Data artefacts
 data/raw/
-data/processed/
 data/predictions.csv
 *.parquet
 

@@ -43,11 +43,22 @@ def encode_features(df: pd.DataFrame) -> pd.DataFrame:
 	return X
 
 
+def _pick_ratio(brand, line, ratio_by_brand_line, ratio_by_brand, ratio_global):
+	cand = ratio_by_brand_line.get((brand, line))
+	if cand is None:
+		cand = ratio_by_brand.get(brand)
+	if cand is None:
+		cand = ratio_global
+	return float(cand)
+
+
 def train_models(pairs: pd.DataFrame):
 	# Ratio estimator (brand- and brand-line-level medians)
 	ratio_global = pairs["ratio"].median()
-	ratio_by_brand = pairs.groupby("brand")["ratio"].median().to_dict()
-	ratio_by_brand_line = pairs.groupby(["brand", "line"])["ratio"].median().to_dict()
+	norm = pairs.assign(brand=pairs["brand"].map(_normalize_str),
+	                    line=pairs["line"].map(_normalize_str))
+	ratio_by_brand = norm.groupby("brand")["ratio"].median().to_dict()
+	ratio_by_brand_line = norm.groupby(["brand", "line"])["ratio"].median().to_dict()
 
 	# Ridge on features to predict wholesale from retail + features
 	X = encode_features(pairs)
@@ -58,6 +69,22 @@ def train_models(pairs: pd.DataFrame):
 	rf = RandomForestRegressor(n_estimators=100, random_state=42)
 	rf.fit(X, y)
 
+	# In-sample blended predictions -> relative-error interval (IQR of errors).
+	ratio_pred = pairs.apply(
+		lambda r: _pick_ratio(_normalize_str(r["brand"]), _normalize_str(r["line"]),
+		                      ratio_by_brand_line, ratio_by_brand,
+		                      float(ratio_global) if pd.notna(ratio_global) else 0.5),
+		axis=1,
+	).values * pairs["retail_aed"].astype(float).values
+	blended = 0.4 * ratio_pred + 0.3 * ridge.predict(X) + 0.3 * rf.predict(X)
+	rel_err = (y - blended) / blended
+	if len(pairs) >= 5:
+		interval = (float(np.quantile(rel_err, 0.25)), float(np.quantile(rel_err, 0.75)))
+		interval_basis = "iqr"
+	else:
+		interval = (-0.15, 0.15)
+		interval_basis = "default"
+
 	return {
 		"ratio_global": float(ratio_global) if pd.notna(ratio_global) else 0.5,
 		"ratio_by_brand": ratio_by_brand,
@@ -65,6 +92,8 @@ def train_models(pairs: pd.DataFrame):
 		"ridge": ridge,
 		"rf": rf,
 		"feature_columns": list(X.columns),
+		"interval": interval,
+		"interval_basis": interval_basis,
 	}
 
 
@@ -87,12 +116,8 @@ def predict_for_retail(retail_df: pd.DataFrame, models: dict, known_wholesale_ke
 	def pick_ratio(row):
 		brand = _normalize_str(row["brand"])
 		line = _normalize_str(row["line"])
-		cand = models["ratio_by_brand_line"].get((brand, line))
-		if cand is None:
-			cand = models["ratio_by_brand"].get(brand)
-		if cand is None:
-			cand = models["ratio_global"]
-		return float(cand)
+		return _pick_ratio(brand, line, models["ratio_by_brand_line"],
+		                   models["ratio_by_brand"], models["ratio_global"])
 
 	ret["ratio"] = ret.apply(pick_ratio, axis=1)
 	ret["ratio_pred"] = ret["retail_aed"].astype(float) * ret["ratio"].astype(float)
@@ -117,10 +142,10 @@ def predict_for_retail(retail_df: pd.DataFrame, models: dict, known_wholesale_ke
 		+ 0.3 * ret["rf_pred"]
 	)
 
-	# Simple CI using IQR of ratio errors if available
-	ci_width = 0.15  # 15% band default
-	ret["ci_low"] = ret["predicted_wholesale_aed"] * (1 - ci_width)
-	ret["ci_high"] = ret["predicted_wholesale_aed"] * (1 + ci_width)
+	# Prediction interval from training-error IQR (falls back to ±15% when <5 pairs).
+	lo, hi = models["interval"]
+	ret["ci_low"] = ret["predicted_wholesale_aed"] * (1 + lo)
+	ret["ci_high"] = ret["predicted_wholesale_aed"] * (1 + hi)
 
 	# Confidence: based on whether brand-line ratio existed and retail available
 	def conf_label(row):
@@ -143,21 +168,13 @@ def predict_for_retail(retail_df: pd.DataFrame, models: dict, known_wholesale_ke
 
 
 def evaluate_model(pairs: pd.DataFrame) -> None:
-	"""
-	Evaluate precision at the 20%+ spread threshold on an 80/20 hold-out split.
+	"""Precision/recall at the 20%+ spread threshold on an 80/20 hold-out split.
 
-	'20%+ spread' = wholesale_aed / retail_aed <= 0.80 (wholesale at least 20%
-	below retail, implying viable import margin after FX + shipping + GST).
-
-	Prints precision: of products the model flags as having >=20% spread,
-	what fraction actually do in the hold-out set?
-
-	NOTE: Meaningful on the full 1,500+ row dataset collected Oct 2024–Jan 2025.
-	The demo sample is too small for a reliable split — run for code verification only.
+	'20%+ spread' = wholesale_aed / retail_aed <= 0.80. All numbers printed are
+	computed from the provided pairs; small samples make them noisy.
 	"""
 	if len(pairs) < 5:
 		print(f"WARNING: {len(pairs)} pairs — too few for a reliable split (need 5+).")
-		print("On the full 1,500+ row dataset this metric yields ~70% precision.")
 		return
 
 	from sklearn.model_selection import train_test_split
@@ -202,11 +219,14 @@ def evaluate_model(pairs: pd.DataFrame) -> None:
 	fp = int(((merged["predicted_flag"]) & (~merged["actual_flag"])).sum())
 	precision = tp / (tp + fp) if (tp + fp) > 0 else float("nan")
 
+	fn = int(((~merged["predicted_flag"]) & (merged["actual_flag"])).sum())
+	recall = tp / (tp + fn) if (tp + fn) > 0 else float("nan")
+
 	print(f"Evaluation (n_test={len(merged)}):")
 	print(f"  Flagged spread >=20%: {int(merged['predicted_flag'].sum())}")
-	print(f"  Precision at spread >=20%: {precision:.1%}")
-	print("  NOTE: Demo sample too small — metric is for code verification only.")
-	print("  On full 1,500+ row dataset this metric yields ~70% precision.")
+	print(f"  Precision: {precision:.1%}   Recall: {recall:.1%}")
+	print("  Caveat: computed on the shipped sample dataset; treat as a code check,")
+	print("  not a performance claim — the metric is noisy at this sample size.")
 
 
 def main():
@@ -237,6 +257,8 @@ def main():
 			"ridge": Ridge().fit(np.zeros((1,1)), np.zeros(1)),
 			"rf": RandomForestRegressor(n_estimators=10, random_state=42).fit(np.zeros((1,1)), np.zeros(1)),
 			"feature_columns": ["size_ml"],
+			"interval": (-0.15, 0.15),
+			"interval_basis": "default",
 		}
 
 	known_keys = set(_key(wholesale_df))

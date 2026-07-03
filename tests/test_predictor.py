@@ -1,9 +1,11 @@
-"""Tests for models/wholesale_price_predictor.py"""
+"""Tests for perfume_radar/predictor.py"""
 import io
 from contextlib import redirect_stdout
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
+import pytest
 from perfume_radar.predictor import (
     prepare_training_pairs,
     train_models,
@@ -72,9 +74,40 @@ def test_evaluate_model_warns_on_tiny_dataset():
     assert "WARNING" in output or "too few" in output.lower()
 
 
+def test_interval_derived_from_iqr():
+    pairs = _make_pairs(12)
+    models = train_models(pairs)
+    assert models["interval_basis"] == "iqr"
+    lo, hi = models["interval"]
+    assert lo < hi
+    retail_df = pd.DataFrame([{
+        "brand": "Lattafa", "line": "TestLine", "name": "TestProduct",
+        "size_ml": 100, "concentration": "EDP", "retail_aed": 50.0,
+    }])
+    row = predict_for_retail(retail_df, models, known_wholesale_keys=set()).iloc[0]
+    pred = row["predicted_wholesale_aed"]
+    assert row["ci_low"] == pytest.approx(pred * (1 + lo), rel=1e-6)
+    assert row["ci_high"] == pytest.approx(pred * (1 + hi), rel=1e-6)
+
+
+def test_interval_default_on_tiny_sample():
+    models = train_models(_make_pairs(4))
+    assert models["interval_basis"] == "default"
+    assert models["interval"] == (-0.15, 0.15)
+
+
+def test_no_unverifiable_claims_in_source():
+    src = Path("perfume_radar/predictor.py").read_text()
+    for banned in ("70%", "1,500", "1500+"):
+        assert banned not in src, f"unverifiable claim '{banned}' still in predictor.py"
+
+
 if __name__ == "__main__":
     test_train_models_returns_rf_key()
     test_blend_uses_three_estimators()
     test_evaluate_model_runs_without_crash()
     test_evaluate_model_warns_on_tiny_dataset()
+    test_interval_derived_from_iqr()
+    test_interval_default_on_tiny_sample()
+    test_no_unverifiable_claims_in_source()
     print("All predictor tests passed.")
